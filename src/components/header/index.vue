@@ -3,16 +3,17 @@
     <div class="wrap">
       <div class="inner">
         <div class="wrap-left">
-          <h1>
+          <h1 @click="changeNav(0, true)">
             <router-link to="/" class="logo">网易云音乐</router-link>
           </h1>
           <ul class="nav">
-            <li v-for="(nav, i) in topNavs" :key="i" @click="goTo(nav)">
-              <router-link
-                :to="nav.path"
-                :class="{ active: nav.path === $route.fullPath }"
-                >{{ nav.value }}</router-link
-              >
+            <li
+              v-for="(nav, i) in topNavs"
+              :key="i"
+              @click="changeNav(i, true)">
+              <router-link :to="nav.path" :class="{ active: i === curNav }">{{
+                nav.value
+              }}</router-link>
             </li>
           </ul>
         </div>
@@ -31,8 +32,13 @@
     <div class="bar">
       <div class="inner">
         <ul class="nav">
-          <li v-for="(nav, i) in childNavs" :key="i" @click="goTo(nav)">
-            <router-link :to="nav.path" :class="{ active: i == 0 }"
+          <li
+            v-for="(nav, i) in childNavs"
+            :key="i"
+            @click="changeNav(i, false)">
+            <router-link
+              :to="nav.totalPath"
+              :class="{ active: i === curChildNav }"
               ><span>{{ nav.value }}</span></router-link
             >
           </li>
@@ -49,7 +55,34 @@ export default {
       topNavs: [
         {
           path: "/",
+          alias: "/discover",
           value: "发现音乐",
+          children: [
+            {
+              path: "",
+              value: "推荐",
+            },
+            {
+              path: "/toplist",
+              value: "排行榜",
+            },
+            {
+              path: "/playlist",
+              value: "歌单",
+            },
+            {
+              path: "/djradio",
+              value: "主播电台",
+            },
+            {
+              path: "/artist",
+              value: "歌手",
+            },
+            {
+              path: "/album",
+              value: "新碟上架",
+            },
+          ],
         },
         {
           path: "/my",
@@ -76,37 +109,29 @@ export default {
           value: "下载客户端",
         },
       ],
-      childNavs: [
-        {
-          path: "/discover",
-          value: "推荐",
-        },
-        {
-          path: "/discover/toplist",
-          value: "排行榜",
-        },
-        {
-          path: "/discover/playlist",
-          value: "歌单",
-        },
-        {
-          path: "/discover/djradio",
-          value: "主播电台",
-        },
-        {
-          path: "/discover/artist",
-          value: "歌手",
-        },
-        {
-          path: "/discover/album",
-          value: "新碟上架",
-        },
-      ],
+      curNav: 0,
+      curChildNav: 0,
     };
   },
+  computed: {
+    childNavs() {
+      let parent = this.topNavs[this.curNav];
+      let children = parent.children || [];
+      return children.map((nav) => {
+        nav.totalPath = parent.alias + nav.path;
+        return nav;
+      });
+    },
+  },
   methods: {
-    goTo(nav) {
-      console.log(nav, this.$route);
+    // 切换当前nav,flag为true处理父nav,false处理子nav
+    changeNav(i, flag) {
+      if (flag) {
+        this.curNav = i;
+        this.curChildNav = 0;
+      } else {
+        this.curChildNav = i;
+      }
     },
   },
 };
@@ -240,10 +265,10 @@ h1 {
   }
   .bar {
     width: 100%;
-    height: 35px;
     box-sizing: border-box;
     border-bottom: 1px solid #a40011;
     background-color: #c20c0c;
+    padding: 4px 0 0 0;
     .nav {
       color: #fff;
       display: flex;
@@ -263,7 +288,7 @@ h1 {
         display: block;
         padding: 0 13px;
         line-height: 20px;
-        margin: 7px 17px 0;
+        margin: 3px 17px 7px;
         border-radius: 20px;
       }
     }
