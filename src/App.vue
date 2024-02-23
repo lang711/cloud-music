@@ -1,6 +1,7 @@
 <template>
   <div id="app">
     <music-header></music-header>
+    <router-view></router-view>
   </div>
 </template>
 
@@ -14,7 +15,7 @@ export default {
 };
 </script>
 
-<style lang="less" scoped>
+<style lang="less">
 #app {
   color: red;
   height: 2000px;

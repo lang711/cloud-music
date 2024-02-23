@@ -4,16 +4,16 @@
       <div class="inner">
         <div class="wrap-left">
           <h1>
-            <a href="#" class="logo">网易云音乐</a>
+            <router-link to="/" class="logo">网易云音乐</router-link>
           </h1>
           <ul class="nav">
-            <li><a href="#" class="active">发现音乐</a></li>
-            <li><a href="#">我的音乐</a></li>
-            <li><a href="#">关注</a></li>
-            <li><a href="#">商城</a></li>
-            <li><a href="#">音乐人</a></li>
-            <li><a href="#">云推歌</a></li>
-            <li><a href="#">下载客户端</a></li>
+            <li v-for="(nav, i) in topNavs" :key="i" @click="goTo(nav)">
+              <router-link
+                :to="nav.path"
+                :class="{ active: nav.path === $route.fullPath }"
+                >{{ nav.value }}</router-link
+              >
+            </li>
           </ul>
         </div>
         <div class="wrap-right">
@@ -31,25 +31,10 @@
     <div class="bar">
       <div class="inner">
         <ul class="nav">
-          <li>
-            <a href="#" class="active">
-              <span>推荐</span>
-            </a>
-          </li>
-          <li>
-            <a href="#"><span>排行榜</span></a>
-          </li>
-          <li>
-            <a href="#"><span>歌单</span></a>
-          </li>
-          <li>
-            <a href="#"><span>主播电台</span></a>
-          </li>
-          <li>
-            <a href="#"><span>歌手</span></a>
-          </li>
-          <li>
-            <a href="#"><span>新碟上架</span></a>
+          <li v-for="(nav, i) in childNavs" :key="i" @click="goTo(nav)">
+            <router-link :to="nav.path" :class="{ active: i == 0 }"
+              ><span>{{ nav.value }}</span></router-link
+            >
           </li>
         </ul>
       </div>
@@ -58,7 +43,73 @@
 </template>
 
 <script>
-export default {};
+export default {
+  data() {
+    return {
+      topNavs: [
+        {
+          path: "/",
+          value: "发现音乐",
+        },
+        {
+          path: "/my",
+          value: "我的音乐",
+        },
+        {
+          path: "/friend",
+          value: "关注",
+        },
+        {
+          path: "/store",
+          value: "商城",
+        },
+        {
+          path: "/musician",
+          value: "音乐人",
+        },
+        {
+          path: "/adSong",
+          value: "云推歌",
+        },
+        {
+          path: "/download",
+          value: "下载客户端",
+        },
+      ],
+      childNavs: [
+        {
+          path: "/discover",
+          value: "推荐",
+        },
+        {
+          path: "/discover/toplist",
+          value: "排行榜",
+        },
+        {
+          path: "/discover/playlist",
+          value: "歌单",
+        },
+        {
+          path: "/discover/djradio",
+          value: "主播电台",
+        },
+        {
+          path: "/discover/artist",
+          value: "歌手",
+        },
+        {
+          path: "/discover/album",
+          value: "新碟上架",
+        },
+      ],
+    };
+  },
+  methods: {
+    goTo(nav) {
+      console.log(nav, this.$route);
+    },
+  },
+};
 </script>
 
 <style lang="less" scoped>
