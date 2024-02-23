@@ -1,5 +1,5 @@
 <template>
-  <div id="app"></div>
+  <div id="app">hello</div>
 </template>
 
 <script>
@@ -8,4 +8,8 @@ export default {
 };
 </script>
 
-<style></style>
+<style lang="less" scoped>
+#app {
+  color: red;
+}
+</style>
