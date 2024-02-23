@@ -4,6 +4,22 @@ import Vue from "vue";
 Vue.use(vueRouter);
 const routes = [
   {
+    path: "/playlist",
+    component: () => import("views/playlist"),
+  },
+  {
+    path: "/song",
+    component: () => import("views/song"),
+  },
+  {
+    path: "/album",
+    component: () => import("views/album"),
+  },
+  {
+    path: "/artist",
+    component: () => import("views/artist"),
+  },
+  {
     path: "/",
     alias: "/discover",
     component: () => import("views/discover"),

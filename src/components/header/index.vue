@@ -18,10 +18,7 @@
           </ul>
         </div>
         <div class="wrap-right">
-          <div class="search">
-            <input type="text" class="input" />
-            <label for="input">音乐/视频/电台/用户</label>
-          </div>
+          <Search @initChildNav="curChildNav = -1"></Search>
           <a href="#" class="author">创作者中心</a>
           <div class="login">
             <a href="#">登录</a>
@@ -49,6 +46,7 @@
 </template>
 
 <script>
+import Search from "./search";
 export default {
   data() {
     return {
@@ -134,6 +132,9 @@ export default {
       }
     },
   },
+  components: {
+    Search,
+  },
 };
 </script>
 
@@ -211,31 +212,6 @@ h1 {
     }
     .wrap-right {
       display: flex;
-      .search {
-        width: 158px;
-        height: 32px;
-        border-radius: 32px;
-        background: #fff;
-        position: relative;
-        box-sizing: border-box;
-        padding: 8px 0 0 30px;
-        background-image: url(https://s2.music.126.net/style/web2/img/frame/topbar.png?70d5ce6f1ee210ec98c45773eca88a52);
-        background-position: 0 -99px;
-        margin-top: 19px;
-        .input {
-          width: 95%;
-          border: none;
-          outline: none;
-          line-height: 16px;
-          height: 14px;
-        }
-        label {
-          color: #9b9b9b;
-          position: absolute;
-          left: 30px;
-          top: 10px;
-        }
-      }
       .author {
         display: block;
         width: 90px;
