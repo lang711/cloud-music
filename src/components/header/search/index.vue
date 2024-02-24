@@ -5,6 +5,8 @@
         type="text"
         id="input"
         v-model="keyword"
+        @compositionstart="flag = false"
+        @compositionend="flag = true"
         @input="search"
         @blur.stop="blur"
         @focus="focus" />
@@ -43,6 +45,7 @@ export default {
       placeholder: true,
       result: false,
       results: [],
+      flag: true,
       order: {
         songs: {
           icon: "icon-song",
@@ -65,11 +68,15 @@ export default {
   },
   methods: {
     search() {
-      this.result = !!this.keyword.trim();
-      this.$api.getSearchAdvice(this.keyword).then((res) => {
-        if (res.code === 200) {
-          console.log(res.result);
-          this.results = res.result;
+      this.$nextTick(() => {
+        if (this.flag) {
+          this.result = !!this.keyword.trim();
+          this.$api.getSearchAdvice(this.keyword).then((res) => {
+            if (res.code === 200) {
+              console.log(res.result);
+              this.results = res.result;
+            }
+          });
         }
       });
     },
