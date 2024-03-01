@@ -1,9 +1,20 @@
 <template>
-  <div class="recommend">推荐</div>
+  <div class="recommend">
+    <cloud-home-swiper></cloud-home-swiper>
+  </div>
 </template>
 
 <script>
-export default {};
+import cloudHomeSwiper from "./cloud-home-swiper";
+export default {
+  components: {
+    cloudHomeSwiper,
+  },
+};
 </script>
 
-<style></style>
+<style lang="less" scoped>
+.recommend {
+  width: 100%;
+}
+</style>
