@@ -1,4 +1,5 @@
 import axios from "axios";
+import Vue from "vue";
 
 const instance = axios.create({
   baseURL: "http://localhost:3000",
@@ -34,6 +35,12 @@ instance.interceptors.response.use(
   function (error) {
     // 超出 2xx 范围的状态码都会触发该函数。
     // 对响应错误做点什么
+    const Message = Vue.prototype.$message;
+    Message({
+      showClose: true,
+      message: error.message,
+      type: "error",
+    });
     return Promise.reject(error);
   }
 );
