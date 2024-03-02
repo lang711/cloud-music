@@ -12,6 +12,7 @@
     "element-ui": "^2.15.14",
     "less-loader": "^7.3.0",
     "normalize.css": "^8.0.1",
+    "swiper": "^4.5.1",
     "vue": "^2.6.11",
     "vue-router": "^3.6.5"
   },

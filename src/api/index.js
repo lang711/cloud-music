@@ -4,3 +4,8 @@ import { request } from "./request";
 export const getSearchAdvice = (keyword) => {
   return request(`/search/suggest?keywords=${keyword}`);
 };
+
+// 轮播图banner
+export const getBanner = () => {
+  return request("/banner");
+};

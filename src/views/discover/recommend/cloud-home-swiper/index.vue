@@ -1,33 +1,34 @@
 <template>
-  <div
-    class="home-swiper"
-    style="
-      background-image: url(http://p1.music.126.net/-JnGj7SHGvDZ3thi-dCSLw==/109951169375333650.jpg?imageView&blur=40x20);
-    ">
-    <div class="inner">
-      <div class="swiper">
-        <div class="swiper-item">
-          <img
-            src="https://p1.music.126.net/-JnGj7SHGvDZ3thi-dCSLw==/109951169375333650.jpg?imageView&quality=89"
-            alt="" />
+  <div class="home-swiper">
+    <div class="bg">
+      <div class="mySwiper">
+        <div class="swiper-wrapper">
+          <div
+            class="swiper-slide"
+            v-for="(banner, index) in banners"
+            :key="index">
+            <img :src="`${banners[curIndex]?.imageUrl}?imageView&blur=40x20`" />
+          </div>
         </div>
-        <ul class="dots">
-          <li><a href="#" class="active"></a></li>
-          <li><a href="#"></a></li>
-          <li><a href="#"></a></li>
-          <li><a href="#"></a></li>
-          <li><a href="#"></a></li>
-          <li><a href="#"></a></li>
-          <li><a href="#"></a></li>
-          <li><a href="#"></a></li>
-          <li><a href="#"></a></li>
-          <li><a href="#"></a></li>
-        </ul>
-        <a href="#" class="left-btn btn">&lt;</a>
-        <a href="#" class="right-btn btn">></a>
+      </div>
+    </div>
+    <div class="inner">
+      <div class="swiper mySwiper">
+        <div class="swiper-wrapper">
+          <div
+            class="swiper-slide"
+            v-for="(banner, index) in banners"
+            @click="goTo(banner)"
+            :key="index">
+            <img :src="banner.imageUrl" alt="" />
+          </div>
+        </div>
+        <a class="left-btn btn">&lt;</a>
+        <a class="right-btn btn">></a>
+        <div class="dots"></div>
       </div>
       <div class="download">
-        <a href="#">广告</a>
+        <router-link to="/download">广告</router-link>
         <p>PC 安卓 iPhone WP iPad Mac 六大客户端</p>
       </div>
     </div>
@@ -35,26 +36,88 @@
 </template>
 
 <script>
-export default {};
+import Swiper from "swiper";
+import "swiper/dist/css/swiper.min.css";
+export default {
+  data() {
+    return {
+      banners: [],
+      curIndex: 0,
+    };
+  },
+  mounted() {
+    this.$api.getBanner().then((res) => {
+      if (res.code === 200) {
+        this.banners = res.banners;
+        this.$nextTick(() => {
+          let that = this;
+          let bgSwiper=new Swiper(".mySwiper", {
+            effect: "fade",
+            allowTouchMove: false,
+          });
+          let swiper = new Swiper(".swiper", {
+            effect: "fade",
+            initialSlide: 0,
+            loop: true,
+            autoplay: true,
+            allowTouchMove: false,
+            pagination: {
+              el: ".dots",
+              clickable: true,
+            },
+            navigation: {
+              nextEl: ".right-btn",
+              prevEl: ".left-btn",
+            },
+            on: {
+              click: function () {
+                swiper.autoplay.start();
+              },
+              slideChange: function () {
+                that.curIndex = swiper.realIndex;
+              },
+            },
+          });
+          this.swiper = swiper;
+        });
+      }
+    });
+  },
+  methods: {
+    goTo(banner) {
+      const target = {
+        1000: "playlist",
+        1: "song",
+        10: "album",
+      };
+      let { targetType, targetId } = banner;
+      this.$router.push(`/${target[targetType]}?id=${targetId}`);
+    },
+  },
+};
 </script>
 
 <style lang="less" scoped>
 .home-swiper {
   font-size: 12px;
   width: 100%;
-  background-size: 6000px;
-  background-position: center;
+  position: relative;
   .inner {
     width: 982px;
     height: 285px;
     margin: 0 auto;
     position: relative;
     .swiper {
-      .swiper-item {
-        width: 730px;
+      width: 730px;
+      height: 100%;
+      overflow: hidden;
+      .swiper-slide {
+        cursor: pointer;
         img {
           display: block;
           width: 100%;
+          height: 100%;
+          max-height: 285px;
         }
       }
 
@@ -90,17 +153,21 @@ export default {};
         display: flex;
         margin-right: -254px;
         justify-content: center;
-        a {
+        z-index: 99;
+        /deep/.swiper-pagination-bullet {
           display: block;
           width: 20px;
           height: 20px;
           background: url(https://s2.music.126.net/style/web2/img/index/banner.png?c09a60e7001a00532cff1ade2c04683e);
           background-position: 3px -343px;
           margin: 0 2px;
-          &:hover,
-          &.active {
+          opacity: 1;
+          &:hover {
             background-position-x: -16px;
           }
+        }
+        /deep/.swiper-pagination-bullet-active {
+          background-position-x: -16px;
         }
       }
     }
@@ -155,6 +222,29 @@ export default {};
         line-height: 16px;
       }
     }
+  }
+}
+
+.bg {
+  position: absolute;
+  width: 100%;
+  height: 285px;
+  left: 0;
+  top: 0;
+  overflow: hidden;
+  z-index: -1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  img {
+    display: block;
+    width: 6000px;
+    height: 6000px;
+    margin: auto;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
   }
 }
 </style>
