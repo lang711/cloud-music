@@ -20,8 +20,16 @@ const routes = [
     component: () => import("views/artist"),
   },
   {
-    path: "/",
-    alias: "/discover",
+    path: "/login",
+    component: () => import("views/login"),
+  },
+  {
+    path: "/author",
+    component: () => import("views/author"),
+  },
+  {
+    path: "/discover",
+    alias: "/",
     component: () => import("views/discover"),
     children: [
       {
@@ -50,6 +58,7 @@ const routes = [
       },
     ],
   },
+
   {
     path: "/my",
     component: () => import("views/my"),

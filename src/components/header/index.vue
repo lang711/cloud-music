@@ -3,25 +3,24 @@
     <div class="wrap">
       <div class="inner">
         <div class="wrap-left">
-          <h1 @click="changeNav(0, true)">
+          <h1 @click="curNav = 0">
             <router-link to="/" class="logo">网易云音乐</router-link>
           </h1>
           <ul class="nav">
-            <li
-              v-for="(nav, i) in topNavs"
-              :key="i"
-              @click="changeNav(i, true)">
-              <router-link :to="nav.path" :class="{ active: i === curNav }">{{
+            <li v-for="(nav, i) in topNavs" :key="i" @click="curNav = i">
+              <router-link :to="nav.path" :class="{ active: matchUrl(nav) }">{{
                 nav.value
               }}</router-link>
             </li>
           </ul>
         </div>
         <div class="wrap-right">
-          <Search @initChildNav="curChildNav = -1"></Search>
-          <a href="#" class="author">创作者中心</a>
-          <div class="login">
-            <a href="#">登录</a>
+          <Search @initNav="curNav = -1"></Search>
+          <div @click="curNav = -1">
+            <router-link to="/author" class="author">创作者中心</router-link>
+          </div>
+          <div class="login" @click="curNav = -1">
+            <router-link to="/login">登录</router-link>
           </div>
         </div>
       </div>
@@ -29,13 +28,8 @@
     <div class="bar">
       <div class="inner">
         <ul class="nav">
-          <li
-            v-for="(nav, i) in childNavs"
-            :key="i"
-            @click="changeNav(i, false)">
-            <router-link
-              :to="nav.totalPath"
-              :class="{ active: i === curChildNav }"
+          <li v-for="(nav, i) in childNavs" :key="i">
+            <router-link :to="nav.totalPath" :class="{ active: matchUrl(nav) }"
               ><span>{{ nav.value }}</span></router-link
             >
           </li>
@@ -108,12 +102,11 @@ export default {
         },
       ],
       curNav: 0,
-      curChildNav: 0,
     };
   },
   computed: {
     childNavs() {
-      let parent = this.topNavs[this.curNav];
+      let parent = this.topNavs[this.curNav] || {};
       let children = parent.children || [];
       return children.map((nav) => {
         nav.totalPath = parent.alias + nav.path;
@@ -122,14 +115,16 @@ export default {
     },
   },
   methods: {
-    // 切换当前nav,flag为true处理父nav,false处理子nav
-    changeNav(i, flag) {
-      if (flag) {
-        this.curNav = i;
-        this.curChildNav = 0;
-      } else {
-        this.curChildNav = i;
-      }
+    matchUrl(nav) {
+      let match = this.$route.matched;
+      let path = nav.totalPath || nav.path;
+      return match.some((m) => {
+        if (m.alias.length) {
+          return m.alias.some((a) => a === nav.path);
+        } else {
+          return m.regex.test(path);
+        }
+      });
     },
   },
   components: {
@@ -161,6 +156,7 @@ h1 {
 }
 .header {
   font-size: 12px;
+  min-width: 1100px;
   .wrap {
     height: 70px;
     width: 100%;

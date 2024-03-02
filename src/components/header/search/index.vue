@@ -103,7 +103,7 @@ export default {
     goTo(name, res) {
       name = name.slice(0, -1);
       this.$router.push(`/${name}?id=${res.id}`);
-      this.$emit("initChildNav");
+      this.$emit("initNav");
     },
   },
 };
