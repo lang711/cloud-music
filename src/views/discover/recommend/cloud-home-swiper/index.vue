@@ -51,7 +51,7 @@ export default {
         this.banners = res.banners;
         this.$nextTick(() => {
           let that = this;
-          let bgSwiper=new Swiper(".mySwiper", {
+          let bgSwiper = new Swiper(".mySwiper", {
             effect: "fade",
             allowTouchMove: false,
           });
@@ -232,7 +232,7 @@ export default {
   left: 0;
   top: 0;
   overflow: hidden;
-  z-index: -1;
+  z-index: 0;
   display: flex;
   justify-content: center;
   align-items: center;
