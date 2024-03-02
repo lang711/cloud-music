@@ -1,9 +1,13 @@
 <template>
-  <div class="songMenu">歌单</div>
+  <div class="songMenu">歌单gedan</div>
 </template>
 
 <script>
-export default {};
+export default {
+  mounted() {
+    console.log(this.$route);
+  },
+};
 </script>
 
 <style></style>
