@@ -9,3 +9,13 @@ export const getSearchAdvice = (keyword) => {
 export const getBanner = () => {
   return request("/banner");
 };
+
+// 热门歌单推荐
+export const getHotPlaylist = () => {
+  return request(`/personalized?limit=8&rnd=${Math.random()}`);
+};
+
+// 热门歌单分类
+export const getHotCategory=()=>{
+  return request("/playlist/hot");
+}

@@ -7,35 +7,33 @@
           <a href="#">热门推荐</a>
         </h2>
         <ul class="navs">
-          <li><a href="#">华语</a></li>
-          <li><a href="#">流行</a></li>
-          <li><a href="#">摇滚</a></li>
-          <li><a href="#">民谣</a></li>
-          <li><a href="#">电子</a></li>
+          <li v-for="tag in tags" :key="tag.id" @click="goTo(tag)">
+            <a>{{ tag.name }}</a>
+          </li>
         </ul>
       </div>
       <div class="head-right">
-        <a href="#" class="more">更多</a>
+        <router-link to="/discover/playlist" class="more">更多</router-link>
         <i class="icon icon-arrow"></i>
       </div>
     </div>
     <div class="content">
       <ul class="imglist">
-        <li>
+        <li v-for="playlist in playlists" :key="playlist.id">
           <div class="imgBox">
-            <a href="#" class="mask"></a>
-            <img
-              src="https://p1.music.126.net/dMlINUxUskjYg30JTRYexw==/19221662277102979.jpg?param=140y140"
-              alt="" />
+            <a href="#" class="mask" :title="playlist.name"></a>
+            <img :src="playlist.picUrl" />
             <div class="bar">
               <div class="bar-left">
                 <i class="icon icon-erji"></i>
-                <span>3600万</span>
+                <span>{{ playlist.playCount | count }}</span>
               </div>
               <a href="#" class="play"></a>
             </div>
           </div>
-          <p class="detail"><a href="#">奥宇女生：永远的神</a></p>
+          <p class="detail" :title="playlist.name">
+            <a href="#">{{ playlist.name }}</a>
+          </p>
         </li>
       </ul>
     </div>
@@ -43,7 +41,41 @@
 </template>
 
 <script>
-export default {};
+export default {
+  data() {
+    return {
+      playlists: [],
+      tags: [],
+    };
+  },
+  mounted() {
+    this.$api.getHotPlaylist().then((res) => {
+      console.log(res);
+      if (res.code === 200) {
+        this.playlists = res.result;
+      }
+    });
+    this.$api.getHotCategory().then((res) => {
+      if (res.code === 200) {
+        this.tags = res.tags.slice(0, 5);
+      }
+    });
+  },
+  filters: {
+    count(num) {
+      if (num > 10000) {
+        return Math.floor(num / 10000) + "万";
+      } else {
+        return num;
+      }
+    },
+  },
+  methods: {
+    goTo(tag) {
+      this.$router.push(`/discover/playlist/?cat=${tag.name}`);
+    },
+  },
+};
 </script>
 
 <style lang="less" scoped>
@@ -130,8 +162,12 @@ export default {};
     .imglist {
       display: flex;
       margin: 20px 0 0 -42px;
+      flex-wrap: wrap;
       li {
+        flex-shrink: 0;
         padding: 0 0 30px 42px;
+        height: 204px;
+        width: 140px;
         .imgBox {
           position: relative;
           width: 140px;
@@ -146,6 +182,8 @@ export default {};
           }
           img {
             display: block;
+            width: 100%;
+            height: 100%;
           }
           .bar {
             width: 100%;
@@ -193,6 +231,7 @@ export default {};
           font-size: 14px;
           line-height: 1.4;
           color: #333;
+          width: 100%;
           &:hover {
             a {
               text-decoration: underline;
