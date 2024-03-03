@@ -4,7 +4,8 @@
     <div class="body">
       <div class="inner">
         <div class="content">
-          <hot-recommend></hot-recommend>
+          <hot-recommend class="hot-recommend"></hot-recommend>
+          <new-disc></new-disc>
         </div>
         <div class="aside"></div>
       </div>
@@ -15,10 +16,12 @@
 <script>
 import cloudHomeSwiper from "./cloud-home-swiper";
 import hotRecommend from "./hot-recommend";
+import newDisc from "./new-disc";
 export default {
   components: {
     cloudHomeSwiper,
     hotRecommend,
+    newDisc,
   },
 };
 </script>
@@ -40,9 +43,13 @@ export default {
       .content {
         padding: 20px 20px 40px;
         flex: 1;
+        .hot-recommend {
+          margin-bottom: 35px;
+        }
       }
       .aside {
         width: 250px;
+        flex-shrink: 0;
       }
     }
   }

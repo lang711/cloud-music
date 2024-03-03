@@ -4,7 +4,7 @@
       <div class="head-left">
         <h2 class="title">
           <i class="icon icon-circle"></i>
-          <a href="#">热门推荐</a>
+          <router-link to="/discover/playlist">热门推荐</router-link>
         </h2>
         <ul class="navs">
           <li v-for="tag in tags" :key="tag.id" @click="goTo(tag)">
@@ -63,7 +63,7 @@ export default {
   },
   filters: {
     count(num) {
-      if (num > 10000) {
+      if (num > 100000) {
         return Math.floor(num / 10000) + "万";
       } else {
         return num;
@@ -161,11 +161,11 @@ export default {
   .content {
     .imglist {
       display: flex;
-      margin: 20px 0 0 -42px;
+      margin: 20px 0 0 -43px;
       flex-wrap: wrap;
       li {
         flex-shrink: 0;
-        padding: 0 0 30px 42px;
+        padding: 0 0 30px 43px;
         height: 204px;
         width: 140px;
         .imgBox {
@@ -227,7 +227,7 @@ export default {
         }
 
         .detail {
-          margin: 9px 0 3px;
+          margin: 8px 0 3px;
           font-size: 14px;
           line-height: 1.4;
           color: #333;
