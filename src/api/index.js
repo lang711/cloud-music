@@ -34,3 +34,8 @@ export const getAllRank = () => {
 export const getPlaylist = (id) => {
   return request(`/playlist/detail?id=${id}`);
 };
+
+// 热门歌手
+export const getHotSinger = () => {
+  return request("/top/artists");
+};

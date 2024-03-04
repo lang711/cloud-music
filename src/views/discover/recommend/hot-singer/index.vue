@@ -2,17 +2,15 @@
   <div class="hot-singer">
     <div class="head">
       <h4>热门歌手</h4>
-      <a href="#">查看全部 ></a>
+      <a href="#" @click.prevent="goTo()">查看全部 ></a>
     </div>
     <ul class="singers">
-      <li>
-        <a href="#">
-          <img
-            src="https://p1.music.126.net/cSAmmAvsKhm3N-zxWg7QcQ==/109951168490195225.jpg?param=62y62"
-            alt="" />
+      <li v-for="singer in singers" :key="singer.id">
+        <a href="#" @click.prevent="goTo(singer)">
+          <img :src="`${singer.picUrl}?param=62y62`" alt="" />
           <div class="mes">
-            <p class="name">张惠妹</p>
-            <p class="dec">台湾女歌手</p>
+            <p class="name">{{ singer.name }}</p>
+            <p class="dec">{{ singer.alias.join("-") || singer.name }}</p>
           </div>
         </a>
       </li>
@@ -22,7 +20,29 @@
 </template>
 
 <script>
-export default {};
+export default {
+  data() {
+    return {
+      singers: {},
+    };
+  },
+  mounted() {
+    this.$api.getHotSinger().then((res) => {
+      if (res.code === 200) {
+        this.singers = res.artists.slice(0, 5);
+      }
+    });
+  },
+  methods: {
+    goTo(singer) {
+      if (!arguments.length) {
+        this.$router.push("/discover/artist");
+      } else {
+        this.$router.push(`/user?id=${singer.id}`);
+      }
+    },
+  },
+};
 </script>
 
 <style lang="less" scoped>
@@ -50,6 +70,11 @@ export default {};
       background: #fafafa;
       &:hover {
         background: #f4f4f4;
+      }
+      img {
+        display: block;
+        width: 62px;
+        height: 62px;
       }
       .mes {
         border: 1px solid #e9e9e9;
