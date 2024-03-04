@@ -35,7 +35,6 @@ export default {
   .body {
     .inner {
       width: 980px;
-      height: 1500px;
       border-left: 1px solid #d3d3d3;
       border-right: 1px solid #d3d3d3;
       margin: 0 auto;

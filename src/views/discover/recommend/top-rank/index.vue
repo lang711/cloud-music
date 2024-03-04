@@ -1,18 +1,27 @@
 <template>
   <div class="top-rank">
-    <Category title="榜单">
+    <Category title="榜单" @getMore="goTo()">
       <template #content>
         <div class="content">
-          <div class="rank rise">
+          <div class="rank rise" v-for="rank in ranks" :key="rank.id">
             <div class="top">
               <div class="logo">
-                <a href="#" class="mask" title="飙升榜"></a>
-                <img
-                  src="https://p4.music.126.net/pcYHpMkdC69VVvWiynNklA==/109951166952713766.jpg?param=100y100"
-                  alt="" />
+                <a
+                  href="#"
+                  class="mask"
+                  :title="rank.name"
+                  @click.prevent="goTo('toplist', rank)"></a>
+                <img :src="rank.coverImgUrl" alt="" />
               </div>
               <div class="top-right">
-                <h3 class="title"><a href="#" title="飙升榜">飙升榜</a></h3>
+                <h3 class="title">
+                  <a
+                    href="#"
+                    title="飙升榜"
+                    @click.prevent="goTo('toplist', rank)"
+                    >{{ rank.name }}</a
+                  >
+                </h3>
                 <p class="operate">
                   <a href="#" class="icon icon-play" title="播放"></a>
                   <a href="#" class="icon icon-collect" title="收藏"></a>
@@ -20,11 +29,19 @@
               </div>
             </div>
             <ul class="songs">
-              <li>
-                <div class="mes">
-                  <span class="order">1</span>
-                  <a href="#" class="name">别归零</a>
-                </div>
+              <li
+                v-for="(song, index) in rank.tracks.slice(0, 10)"
+                :key="song.id">
+                <span class="order" :class="{ forward: index < 3 }">{{
+                  index + 1
+                }}</span>
+                <a
+                  href="#"
+                  class="name"
+                  :title="song.name"
+                  @click.prevent="goTo('song', song)"
+                  >{{ song.name }}</a
+                >
                 <div class="opts">
                   <a href="#" class="icon icon-play" title="播放"></a>
                   <a href="#" class="icon icon-add" title="添加到播放列表"></a>
@@ -32,69 +49,9 @@
                 </div>
               </li>
             </ul>
-            <a href="#" class="all">查看全部></a>
-          </div>
-          <div class="rank new">
-            <div class="top">
-              <div class="logo">
-                <a href="#" class="mask" title="飙升榜"></a>
-                <img
-                  src="https://p4.music.126.net/pcYHpMkdC69VVvWiynNklA==/109951166952713766.jpg?param=100y100"
-                  alt="" />
-              </div>
-              <div class="top-right">
-                <h3 class="title"><a href="#" title="飙升榜">飙升榜</a></h3>
-                <p class="operate">
-                  <a href="#" class="icon icon-play" title="播放"></a>
-                  <a href="#" class="icon icon-collect" title="收藏"></a>
-                </p>
-              </div>
-            </div>
-            <ul class="songs">
-              <li>
-                <div class="mes">
-                  <span class="order">1</span>
-                  <a href="#" class="name">别归零</a>
-                </div>
-                <div class="opts">
-                  <a href="#" class="icon icon-play" title="播放"></a>
-                  <a href="#" class="icon icon-add" title="添加到播放列表"></a>
-                  <a href="#" class="icon icon-collect" title="收藏"></a>
-                </div>
-              </li>
-            </ul>
-            <a href="#" class="all">查看全部></a>
-          </div>
-          <div class="rank origin">
-            <div class="top">
-              <div class="logo">
-                <a href="#" class="mask" title="飙升榜"></a>
-                <img
-                  src="https://p4.music.126.net/pcYHpMkdC69VVvWiynNklA==/109951166952713766.jpg?param=100y100"
-                  alt="" />
-              </div>
-              <div class="top-right">
-                <h3 class="title"><a href="#" title="飙升榜">飙升榜</a></h3>
-                <p class="operate">
-                  <a href="#" class="icon icon-play" title="播放"></a>
-                  <a href="#" class="icon icon-collect" title="收藏"></a>
-                </p>
-              </div>
-            </div>
-            <ul class="songs">
-              <li>
-                <div class="mes">
-                  <span class="order">1</span>
-                  <a href="#" class="name">别归零</a>
-                </div>
-                <div class="opts">
-                  <a href="#" class="icon icon-play" title="播放"></a>
-                  <a href="#" class="icon icon-add" title="添加到播放列表"></a>
-                  <a href="#" class="icon icon-collect" title="收藏"></a>
-                </div>
-              </li>
-            </ul>
-            <p class="more"><a href="#">查看全部></a></p>
+            <p class="more">
+              <a href="#" @click.prevent="goTo('toplist', rank)">查看全部></a>
+            </p>
           </div>
         </div>
       </template>
@@ -108,13 +65,47 @@ export default {
   components: {
     Category,
   },
+  data() {
+    return {
+      ranks: [],
+    };
+  },
+  mounted() {
+    let ranks = [];
+    this.$api
+      .getAllRank()
+      .then((res) => {
+        if (res.code === 200) {
+          this.$store.commit("SETALLRANK", res.list);
+          return res.list.slice(0, 3);
+        }
+      })
+      .then((ranks) =>
+        Promise.all(ranks.map((rank) => this.$api.getPlaylist(rank.id)))
+      )
+      .then((ranks) => {
+        this.ranks = ranks.map((rank) => rank.code === 200 && rank.playlist);
+        console.log(this.ranks);
+      });
+  },
+  methods: {
+    goTo(target, obj) {
+      if (!arguments.length) {
+        this.$router.push("/discover/toplist");
+      } else if (target === "song") {
+        this.$router.push(`/${target}?id=${obj.id}`);
+      } else if (target === "toplist") {
+        this.$router.push(`/discover/${target}?id=${obj.id}`);
+      }
+    },
+  },
 };
 </script>
 
 <style lang="less" scoped>
 .top-rank {
   .content {
-    margin: 20px auto;
+    margin: 20px auto 0;
     width: 100%;
     height: 472px;
     background: url(https://s2.music.126.net/style/web2/img/index/index_bill.png?976fd64a1084ba968671f6f091d6a973);
@@ -184,34 +175,33 @@ export default {
         }
       }
       .songs {
+        width: 230px;
         li {
           margin-left: 15px;
           display: flex;
           height: 32px;
           line-height: 32px;
           color: #000;
-          justify-content: space-between;
           &:hover {
             .opts {
               display: flex;
             }
           }
-          .mes {
-            display: flex;
-            flex: 1;
-          }
           .order {
             width: 35px;
             text-align: center;
-            color: #c10d0c;
             font-size: 16px;
+            color: #666;
+          }
+          .forward {
+            color: #c10d0c;
           }
           .name {
             &:hover {
               text-decoration: underline;
             }
-            flex: 1;
             max-width: 170px;
+            flex: 1;
             text-overflow: ellipsis;
             overflow: hidden;
             white-space: nowrap;

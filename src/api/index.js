@@ -24,3 +24,13 @@ export const getHotCategory = () => {
 export const getNewAlbum = () => {
   return request("/album/newest");
 };
+
+// 所有榜单
+export const getAllRank = () => {
+  return request("/toplist");
+};
+
+// 歌单详情
+export const getPlaylist = (id) => {
+  return request(`/playlist/detail?id=${id}`);
+};
