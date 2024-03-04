@@ -28,7 +28,7 @@
                 <i class="icon icon-erji"></i>
                 <span>{{ playlist.playCount | count }}</span>
               </div>
-              <a href="#" class="play"></a>
+              <a href="#" class="play" title="播放"></a>
             </div>
           </div>
           <p class="detail" :title="playlist.name">

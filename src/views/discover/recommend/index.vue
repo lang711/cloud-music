@@ -6,6 +6,7 @@
         <div class="content">
           <hot-recommend class="hot-recommend"></hot-recommend>
           <new-disc></new-disc>
+          <top-rank></top-rank>
         </div>
         <div class="aside"></div>
       </div>
@@ -17,11 +18,13 @@
 import cloudHomeSwiper from "./cloud-home-swiper";
 import hotRecommend from "./hot-recommend";
 import newDisc from "./new-disc";
+import topRank from "./top-rank";
 export default {
   components: {
     cloudHomeSwiper,
     hotRecommend,
     newDisc,
+    topRank,
   },
 };
 </script>
@@ -32,7 +35,7 @@ export default {
   .body {
     .inner {
       width: 980px;
-      height: 1000px;
+      height: 1500px;
       border-left: 1px solid #d3d3d3;
       border-right: 1px solid #d3d3d3;
       margin: 0 auto;
