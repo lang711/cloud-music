@@ -39,3 +39,8 @@ export const getPlaylist = (id) => {
 export const getHotSinger = () => {
   return request("/top/artists");
 };
+
+// 热门主播
+export const getHotAnchor = () => {
+  return request("/dj/toplist/popular");
+};

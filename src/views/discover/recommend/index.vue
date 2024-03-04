@@ -16,6 +16,7 @@
             <router-link to="/login">用户登录</router-link>
           </div>
           <hot-singer></hot-singer>
+          <hot-anchor></hot-anchor>
         </div>
       </div>
     </div>
@@ -28,6 +29,7 @@ import hotRecommend from "./hot-recommend";
 import newDisc from "./new-disc";
 import topRank from "./top-rank";
 import hotSinger from "./hot-singer";
+import hotAnchor from "./hot-anchor";
 export default {
   components: {
     cloudHomeSwiper,
@@ -35,6 +37,7 @@ export default {
     newDisc,
     topRank,
     hotSinger,
+    hotAnchor,
   },
 };
 </script>
@@ -68,7 +71,7 @@ export default {
           background: url(https://s2.music.126.net/style/web2/img/index/index.png?5e9995a753a7b0a1e0d3944275f9c1a1);
           background-position: 0 0;
           p {
-            padding: 16px 0 ;
+            padding: 16px 0;
             line-height: 22px;
             margin: 0 auto;
             width: 205px;
