@@ -16,6 +16,11 @@ export const getHotPlaylist = () => {
 };
 
 // 热门歌单分类
-export const getHotCategory=()=>{
+export const getHotCategory = () => {
   return request("/playlist/hot");
-}
+};
+
+// 新碟上架
+export const getNewAlbum = () => {
+  return request("/album/newest");
+};

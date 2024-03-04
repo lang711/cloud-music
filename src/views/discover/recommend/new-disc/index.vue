@@ -1,61 +1,33 @@
 <template>
   <div class="new-disc">
-    <Category title="新碟上架">
+    <Category title="新碟上架" @getMore="goTo()">
       <template #content>
         <div class="content">
-          <ul class="imglist">
-            <li>
-              <div class="imgBox">
-                <img
-                  src="https://p2.music.126.net/S8_bTTmiVhDlN3Eyv7u9xw==/109951169295120032.jpg?param=100y100"
-                  alt="" />
-                <a href="#" class="mask"></a>
-                <a href="#" class="icon icon-play"></a>
+          <div class="swiper-container imglist">
+            <div class="swiper-wrapper">
+              <div class="swiper-slide" v-for="album in albums" :key="album.id">
+                <div class="imgBox">
+                  <img :src="album.picUrl" alt="" />
+                  <a
+                    href="#"
+                    class="mask"
+                    :title="album.name"
+                    @click.prevent="goTo('album', album)"></a>
+                  <a href="#" class="icon icon-play" title="播放"></a>
+                </div>
+                <p class="name" :title="album.name">
+                  <a href="#" @click.prevent="goTo('album', album)">{{
+                    album.name
+                  }}</a>
+                </p>
+                <p class="author" :title="getArtist(album.artists)">
+                  <a href="#" @click.prevent="goTo('artist', album)">{{
+                    getArtist(album.artists)
+                  }}</a>
+                </p>
               </div>
-              <p class="name"><a href="#">2</a></p>
-              <p class="author"><a href="#">苏打绿</a></p>
-            </li>
-            <li>
-              <div class="imgBox">
-                <img
-                  src="https://p2.music.126.net/S8_bTTmiVhDlN3Eyv7u9xw==/109951169295120032.jpg?param=100y100"
-                  alt="" />
-                <a href="#" class="mask"></a>
-              </div>
-              <p class="name"><a href="#">2</a></p>
-              <p class="author"><a href="#">苏打绿</a></p>
-            </li>
-            <li>
-              <div class="imgBox">
-                <img
-                  src="https://p2.music.126.net/S8_bTTmiVhDlN3Eyv7u9xw==/109951169295120032.jpg?param=100y100"
-                  alt="" />
-                <a href="#" class="mask"></a>
-              </div>
-              <p class="name"><a href="#">2</a></p>
-              <p class="author"><a href="#">苏打绿</a></p>
-            </li>
-            <li>
-              <div class="imgBox">
-                <img
-                  src="https://p2.music.126.net/S8_bTTmiVhDlN3Eyv7u9xw==/109951169295120032.jpg?param=100y100"
-                  alt="" />
-                <a href="#" class="mask"></a>
-              </div>
-              <p class="name"><a href="#">2</a></p>
-              <p class="author"><a href="#">苏打绿</a></p>
-            </li>
-            <li>
-              <div class="imgBox">
-                <img
-                  src="https://p2.music.126.net/S8_bTTmiVhDlN3Eyv7u9xw==/109951169295120032.jpg?param=100y100"
-                  alt="" />
-                <a href="#" class="mask"></a>
-              </div>
-              <p class="name"><a href="#">2</a></p>
-              <p class="author"><a href="#">苏打绿</a></p>
-            </li>
-          </ul>
+            </div>
+          </div>
           <a class="left-btn btn"></a>
           <a class="right-btn btn"></a>
         </div>
@@ -66,9 +38,62 @@
 
 <script>
 import Category from "../category";
+import Swiper from "swiper";
+import "swiper/dist/css/swiper.min.css";
+// 缓存作者姓名
+let cache = new Map();
 export default {
   components: {
     Category,
+  },
+  data() {
+    return {
+      albums: [],
+    };
+  },
+  mounted() {
+    this.$api.getNewAlbum().then((res) => {
+      if (res.code === 200) {
+        this.albums = res.albums;
+        this.$nextTick(() => {
+          new Swiper(".swiper-container", {
+            spaceBetween: 11,
+            slidesPerView: 5,
+            slidesPerGroup: 5,
+            allowTouchMove: false,
+            loop: true,
+            loopFillGroupWithBlank: true,
+            navigation: {
+              nextEl: ".right-btn",
+              prevEl: ".left-btn",
+            },
+          });
+        });
+      }
+    });
+  },
+  methods: {
+    goTo(target, album) {
+      if (!arguments.length) {
+        this.$router.push("/discover/album");
+      } else if (target === "album") {
+        this.$router.push(`/discover/${target}?id=${album.id}`);
+      } else if (target === "artist") {
+        this.$router.push(`/${target}?id=${album.artist.id}`);
+      }
+    },
+    getArtist(artists) {
+      if (cache.has(artists)) {
+        return cache.get(artists);
+      } else {
+        let val = artists.map((artist) => artist.name).join(" ");
+        cache.set(artists, val);
+        return val;
+      }
+    },
+  },
+  beforeDestroy() {
+    cache = new Map();
   },
 };
 </script>
@@ -83,21 +108,26 @@ export default {
     position: relative;
     .imglist {
       width: 645px;
-      margin: 29px 27px 0 16px;
       display: flex;
-      li {
+      margin-top: 29px;
+      /deep/.swiper-slide {
         background: url(https://s2.music.126.net/style/web2/img/index/index.png?5e9995a753a7b0a1e0d3944275f9c1a1)
           no-repeat 0 9999px;
         width: 118px;
         height: 150px;
         background-position: -260px 100px;
-        margin-left: 11px;
       }
       .imgBox {
         position: relative;
         width: 100px;
         height: 100px;
         margin-bottom: 6px;
+        &:hover {
+          .icon {
+            opacity: 1;
+            transform: scale(1);
+          }
+        }
         .mask {
           position: absolute;
           width: 118px;
@@ -110,9 +140,15 @@ export default {
         }
         img {
           display: block;
+          width: 100%;
+          height: 100%;
         }
         .icon {
-          display: none;
+          // display: none;
+          opacity: 0;
+          transform: scale(0.6);
+          transform-origin: center;
+          transition: opacity 0.25s, transform 0.25s;
           background-image: url(https://s2.music.126.net/style/web2/img/iconall.png?f3095f34778533f3afe29d01904d9687);
           width: 22px;
           height: 22px;
@@ -134,7 +170,7 @@ export default {
 
       p {
         line-height: 18px;
-        width: 100%;
+        width: 100px;
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
@@ -156,6 +192,7 @@ export default {
       background-image: url(https://s2.music.126.net/style/web2/img/index/index.png?5e9995a753a7b0a1e0d3944275f9c1a1);
       position: absolute;
       top: 71px;
+      z-index: 99;
     }
     .left-btn {
       left: 4px;

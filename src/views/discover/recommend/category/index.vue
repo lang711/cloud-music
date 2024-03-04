@@ -4,14 +4,14 @@
       <div class="head-left">
         <h2 class="title">
           <i class="icon icon-circle"></i>
-          <router-link to="/discover/playlist">{{ title }}</router-link>
+          <a href="#" @click.prevent="$emit('getMore')">{{ title }}</a>
         </h2>
         <div class="navs">
           <slot name="navs"></slot>
         </div>
       </div>
       <div class="head-right">
-        <router-link to="/discover/playlist" class="more">更多</router-link>
+        <a href="#" @click.prevent="$emit('getMore')" class="more">更多</a>
         <i class="icon icon-arrow"></i>
       </div>
     </div>
