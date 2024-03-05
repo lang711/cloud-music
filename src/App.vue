@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <music-header></music-header>
-    <router-view></router-view>
+    <div class="content"><router-view></router-view></div>
     <music-footer></music-footer>
     <a href="#" class="top">回到顶部</a>
   </div>
@@ -22,8 +22,12 @@ export default {
 <style lang="less" scoped>
 #app {
   color: red;
-  height: 2000px;
   background: #f5f5f5;
+  .content {
+    min-width: 1110px;
+    min-height: 900px;
+    margin: 0 auto;
+  }
   .top {
     position: fixed;
     width: 49px;

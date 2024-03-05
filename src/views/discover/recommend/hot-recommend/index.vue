@@ -1,46 +1,50 @@
 <template>
   <div class="hot-recommend">
-    <div class="head">
-      <div class="head-left">
-        <h2 class="title">
-          <i class="icon icon-circle"></i>
-          <router-link to="/discover/playlist">热门推荐</router-link>
-        </h2>
+    <Category title="热门推荐" @getMore="goTo()">
+      <template #navs>
         <ul class="navs">
-          <li v-for="tag in tags" :key="tag.id" @click="goTo(tag)">
+          <li
+            v-for="tag in tags"
+            :key="tag.id"
+            @click="goTo('discover/playlist', tag)">
             <a>{{ tag.name }}</a>
           </li>
         </ul>
-      </div>
-      <div class="head-right">
-        <router-link to="/discover/playlist" class="more">更多</router-link>
-        <i class="icon icon-arrow"></i>
-      </div>
-    </div>
-    <div class="content">
-      <ul class="imglist">
-        <li v-for="playlist in playlists" :key="playlist.id">
-          <div class="imgBox">
-            <a href="#" class="mask" :title="playlist.name"></a>
-            <img :src="playlist.picUrl" />
-            <div class="bar">
-              <div class="bar-left">
-                <i class="icon icon-erji"></i>
-                <span>{{ playlist.playCount | count }}</span>
+      </template>
+      <template #content>
+        <div class="content">
+          <ul class="imglist">
+            <li v-for="playlist in playlists" :key="playlist.id">
+              <div class="imgBox">
+                <a
+                  href="#"
+                  class="mask"
+                  :title="playlist.name"
+                  @click.prevent="goTo('playlist', playlist)"></a>
+                <img :src="playlist.picUrl" />
+                <div class="bar">
+                  <div class="bar-left">
+                    <i class="icon icon-erji"></i>
+                    <span>{{ playlist.playCount | count }}</span>
+                  </div>
+                  <a href="#" class="play" title="播放"></a>
+                </div>
               </div>
-              <a href="#" class="play" title="播放"></a>
-            </div>
-          </div>
-          <p class="detail" :title="playlist.name">
-            <a href="#">{{ playlist.name }}</a>
-          </p>
-        </li>
-      </ul>
-    </div>
+              <p class="detail" :title="playlist.name">
+                <a href="#" @click.prevent="goTo('playlist', playlist)">{{
+                  playlist.name
+                }}</a>
+              </p>
+            </li>
+          </ul>
+        </div>
+      </template>
+    </Category>
   </div>
 </template>
 
 <script>
+import Category from "../category";
 export default {
   data() {
     return {
@@ -71,9 +75,18 @@ export default {
     },
   },
   methods: {
-    goTo(tag) {
-      this.$router.push(`/discover/playlist/?cat=${tag.name}`);
+    goTo(target, obj) {
+      if (!arguments.length) {
+        this.$router.push("/discover/playlist");
+      } else if (target === "discover/playlist") {
+        this.$router.push(`/${target}/?cat=${obj.name}`);
+      } else if (target === "playlist") {
+        this.$router.push(`/${target}?id=${obj.id}`);
+      }
     },
+  },
+  components: {
+    Category,
   },
 };
 </script>

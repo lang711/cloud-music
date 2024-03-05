@@ -28,8 +28,8 @@
               </div>
             </div>
           </div>
-          <a class="left-btn btn"></a>
-          <a class="right-btn btn"></a>
+          <a class="left-btn btn pre"></a>
+          <a class="right-btn btn next"></a>
         </div>
       </template>
     </Category>
@@ -64,8 +64,8 @@ export default {
             loop: true,
             loopFillGroupWithBlank: true,
             navigation: {
-              nextEl: ".right-btn",
-              prevEl: ".left-btn",
+              nextEl: ".next",
+              prevEl: ".pre",
             },
           });
         });

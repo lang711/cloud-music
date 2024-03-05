@@ -156,7 +156,7 @@ h1 {
 }
 .header {
   font-size: 12px;
-  min-width: 1100px;
+  min-width: 1110px;
   .wrap {
     height: 70px;
     width: 100%;

@@ -12,7 +12,7 @@ export const getBanner = () => {
 
 // 热门歌单推荐
 export const getHotPlaylist = () => {
-  return request(`/personalized?limit=8&rnd=${Math.random()}`);
+  return request(`/personalized?limit=8`);
 };
 
 // 热门歌单分类
