@@ -31,7 +31,7 @@ export const getAllRank = () => {
 };
 
 // 歌单详情
-export const getPlaylist = (id) => {
+export const getPlaylistDetail = (id) => {
   return request(`/playlist/detail?id=${id}`);
 };
 
@@ -43,4 +43,16 @@ export const getHotSinger = () => {
 // 热门主播
 export const getHotAnchor = () => {
   return request("/dj/toplist/popular");
+};
+
+// 歌单分类
+export const getPlaylistCat = () => {
+  return request("/playlist/catlist");
+};
+
+// 歌单
+export const getPlaylist = (cat = "all", offset = 0, order) => {
+  return request(
+    `/top/playlist?cat=${cat}&limit=35&offset=${35 * offset}&order=${order}`
+  );
 };

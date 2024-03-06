@@ -2,60 +2,80 @@
   <div class="songMenu">
     <div class="head">
       <div class="head-left">
-        <h2>全部</h2>
+        <h2>{{ cat || "全部" }}</h2>
         <div class="select">
-          <a href="#" class="btn">
+          <a href="#" class="btn" @click.prevent="showCat($event)">
             <span>选择分类</span>
             <i class="icon icon-arrow"></i>
           </a>
-          <div class="categorys">
+          <div class="categorys" v-show="visible" @click.stop>
             <i class="icon icon-arrow"></i>
             <h3>
-              <a href="#">全部风格</a>
+              <a href="#" @click.prevent="goTo('discover/playlist', {})"
+                >全部风格</a
+              >
             </h3>
             <ol class="cats">
-              <li>
+              <li v-for="(category, index) in categorys" :key="index">
                 <h4>
                   <i class="icon icon-cat"></i>
-                  <span>语种</span>
+                  <span>{{ category.name }}</span>
                 </h4>
                 <ul class="category">
-                  <li>
-                    <a href="#">华语</a>
+                  <li v-for="(cat, i) in category.sub" :key="i">
+                    <a
+                      href="#"
+                      @click.prevent="goTo('discover/playlist', cat)"
+                      >{{ cat.name }}</a
+                    >
                     <span class="line">|</span>
                   </li>
-                  <li><a href="#">欧美</a><span class="line">|</span></li>
-                  <li><a href="#">日本</a><span class="line">|</span></li>
-                  <li><a href="#">汉语</a><span class="line">|</span></li>
-                  <li><a href="#">粤语</a><span class="line">|</span></li>
                 </ul>
               </li>
             </ol>
           </div>
         </div>
       </div>
-      <a href="#" class="hot">热门</a>
+      <a
+        href="#"
+        class="hot"
+        @click.prevent="goTo('discover/playlist', { order: 'hot', name: cat })"
+        >热门</a
+      >
     </div>
     <ul class="songs">
-      <li>
+      <li v-for="playlist in playlists" :key="playlist.id">
         <div class="imgBox">
-          <a href="#" class="mask"></a>
-          <img
-            src="https://p1.music.126.net/8fQ9jzTJnMweLNm7VoyPSw==/6623458045881301.jpg?param=140y140" />
+          <a
+            href="#"
+            class="mask"
+            :title="playlist.name"
+            @click.prevent="goTo('playlist', playlist)"></a>
+          <img :src="`${playlist.coverImgUrl}?param=140y140`" />
           <div class="bar">
             <div class="bar-left">
               <i class="icon icon-erji"></i>
-              <span>11118万</span>
+              <span>{{ playlist.playCount | count }}</span>
             </div>
             <a href="#" class="play" title="播放"></a>
           </div>
         </div>
         <p class="detail">
-          <a href="#">那些你熟悉却又不知道名字的轻音乐</a>
+          <a
+            href="#"
+            :title="playlist.name"
+            @click.prevent="goTo('playlist', playlist)"
+            >{{ playlist.name }}</a
+          >
         </p>
         <p class="name">
           <span>by</span>
-          <a href="#">Lelow</a>
+          <a
+            href="#"
+            :title="playlist?.creator.nickname"
+            @click.prevent="goTo('user', playlist.creator)"
+            >{{ playlist?.creator.nickname }}</a
+          >
         </p>
       </li>
     </ul>
@@ -63,9 +83,106 @@
 </template>
 
 <script>
+// 缓存歌单分类
+let cache = null;
 export default {
+  data() {
+    return {
+      playlists: [],
+      categorys: [],
+      cat: "",
+      page: 0,
+      visible: false,
+      order: "",
+    };
+  },
   mounted() {
     console.log(this.$route);
+    let query = this.$route.query;
+    this.getPlaylist(query);
+    document.addEventListener(
+      "click",
+      (this.click = () => {
+        this.visible = false;
+      })
+    );
+  },
+  methods: {
+    getPlaylist(query) {
+      let { cat, page, order } = query;
+      this.cat = cat;
+      this.page = page;
+      this.order = order;
+      this.$api.getPlaylist(cat, page, order).then((res) => {
+        console.log(res);
+        if (res.code === 200) {
+          this.playlists = res.playlists;
+        }
+      });
+    },
+    showCat(event) {
+      event.stopPropagation();
+      if (this.visible) {
+        this.visible = false;
+        return;
+      }
+      if (cache) {
+        this.categorys = cache;
+        this.visible = true;
+        return;
+      }
+      this.$api.getPlaylistCat().then((res) => {
+        if (res.code === 200) {
+          let categorys = Object.values(res.categories).map(
+            (category, index) => {
+              let sub = res.sub.filter((sub) => sub.category === index);
+              return {
+                name: category,
+                sub,
+              };
+            }
+          );
+          this.categorys = categorys;
+          this.visible = true;
+          cache = categorys;
+        }
+      });
+    },
+    goTo(target, obj) {
+      if (target === "discover/playlist") {
+        console.log(obj);
+        this.visible = false;
+        this.$router.push({
+          path: `/${target}/`,
+          query: {
+            cat: obj.name,
+            order: obj.order,
+          },
+        });
+      } else if (target === "playlist") {
+        this.$router.push(`/playlist?id=${obj.id}`);
+      } else if (target === "user") {
+        this.$router.push(`/user?id=${obj.userId}`);
+      }
+    },
+  },
+  watch: {
+    $route(newVal) {
+      this.getPlaylist(newVal.query);
+    },
+  },
+  beforeDestroy() {
+    cache = null;
+    document.removeEventListener("click", this.click);
+  },
+  filters: {
+    count(num) {
+      if (num > 100000) {
+        return Math.floor(num / 10000) + "万";
+      } else {
+        return num;
+      }
+    },
   },
 };
 </script>
@@ -73,7 +190,6 @@ export default {
 <style lang="less" scoped>
 .songMenu {
   width: 982px;
-  height: 1000px;
   padding: 40px;
   box-sizing: border-box;
   border-left: 1px solid #d3d3d3;
@@ -132,12 +248,12 @@ export default {
           }
         }
         .categorys {
-          display: none;
+          z-index: 9;
           background: url(https://s2.music.126.net/style/web2/img/sltlyr.png?5f76f9c7bfd7b9398caef393a69a2d58)
             repeat-y;
           background-position: -720px 0;
           width: 700px;
-          height: 500px;
+
           padding: 0 10px;
           position: absolute;
           top: 67px;
@@ -193,6 +309,11 @@ export default {
           .cats {
             & > li {
               display: flex;
+              &:last-child {
+                .category {
+                  padding-bottom: 25px;
+                }
+              }
               h4 {
                 display: flex;
                 width: 70px;
@@ -213,12 +334,19 @@ export default {
               .category {
                 flex: 1;
                 display: flex;
+                flex-wrap: wrap;
                 padding: 16px 15px 0 15px;
                 border-left: 1px solid #e6e6e6;
                 line-height: 24px;
                 .line {
                   color: #d8d8d8;
                   margin: 0 10px;
+                }
+                a {
+                  color: #333;
+                  &:hover {
+                    text-decoration: underline;
+                  }
                 }
               }
             }
@@ -244,6 +372,7 @@ export default {
     display: flex;
     margin-top: 30px;
     margin-left: -50px;
+    flex-wrap: wrap;
     li {
       padding: 0 0 30px 50px;
     }
@@ -304,11 +433,7 @@ export default {
         }
       }
     }
-    .detail {
-      margin: 9px 0 5px;
-      font-size: 14px;
-      line-height: 1.4;
-      color: #000;
+    p {
       width: 140px;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -319,17 +444,17 @@ export default {
         }
       }
     }
+    .detail {
+      margin: 9px 0 5px;
+      font-size: 14px;
+      line-height: 1.4;
+      color: #000;
+    }
     .name {
       color: #666;
-
       span {
         color: #999;
         margin-right: 3px;
-      }
-      &:hover {
-        a {
-          text-decoration: underline;
-        }
       }
     }
   }

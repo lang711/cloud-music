@@ -71,7 +71,6 @@ export default {
     };
   },
   mounted() {
-    let ranks = [];
     this.$api
       .getAllRank()
       .then((res) => {
@@ -81,7 +80,7 @@ export default {
         }
       })
       .then((ranks) =>
-        Promise.all(ranks.map((rank) => this.$api.getPlaylist(rank.id)))
+        Promise.all(ranks.map((rank) => this.$api.getPlaylistDetail(rank.id)))
       )
       .then((ranks) => {
         this.ranks = ranks.map((rank) => rank.code === 200 && rank.playlist);
