@@ -1,29 +1,91 @@
 <template>
   <div class="navigation">
-    <a href="#" class="pre btn">
+    <a
+      href="#"
+      class="btn"
+      @click.prevent="changeSelect(-1, true)"
+      :class="curSelect !== 1 ? 'pre' : 'disabled'">
       <span>上一页</span>
     </a>
     <div class="navs">
-      <a href="#" class="first">1</a>
-      <span class="more">...</span>
+      <a
+        href="#"
+        class="first"
+        :class="{ select: curSelect === 1 }"
+        @click.prevent="changeSelect(1)"
+        >1</a
+      >
+      <span class="more" v-show="start > 1">...</span>
       <ul class="nav">
-        <li><a href="#">3</a></li>
-        <li><a href="#" class="select">4</a></li>
-        <li><a href="#">5</a></li>
-        <li><a href="#">6</a></li>
-        <li><a href="#">7</a></li>
+        <li v-for="n in end" :key="n">
+          <a
+            href="#"
+            :class="{ select: n + start === curSelect }"
+            @click.prevent="changeSelect(n + start)"
+            >{{ n + start }}</a
+          >
+        </li>
       </ul>
-      <span class="more">...</span>
-      <a href="#" class="end">10</a>
+      <span class="more" v-show="start + step < total - 1">...</span>
+      <a
+        href="#"
+        class="end"
+        :class="{ select: curSelect === total }"
+        @click.prevent="changeSelect(total)"
+        >{{ total }}</a
+      >
     </div>
-    <a href="#" class="next btn">
+    <a
+      href="#"
+      class="btn"
+      @click.prevent="changeSelect(1, true)"
+      :class="curSelect !== total ? 'next' : 'disable'">
       <span>下一页</span>
     </a>
   </div>
 </template>
 
 <script>
-export default {};
+export default {
+  data() {
+    return {
+      total: 5,
+      step: 5,
+      curSelect: 3,
+    };
+  },
+  computed: {
+    start() {
+      let gap = Math.ceil(this.step / 2);
+      if (this.curSelect - gap <= 0 || this.end < this.step) {
+        return 1;
+      } else if (this.curSelect + gap > this.total) {
+        return this.total - this.step - 1;
+      } else {
+        return this.curSelect - gap;
+      }
+    },
+    end() {
+      if (this.total - 2 < this.step) {
+        return this.total - 2;
+      } else {
+        return this.step;
+      }
+    },
+  },
+  methods: {
+    changeSelect(n, flag) {
+      if (flag) {
+        if (this.curSelect + n < 1 || this.curSelect + n > this.total) {
+          return;
+        }
+        this.curSelect += n;
+      } else {
+        this.curSelect = n;
+      }
+    },
+  },
+};
 </script>
 
 <style lang="less" scoped>
@@ -40,6 +102,8 @@ export default {};
     border-radius: 2px;
     border: 1px solid #ccc;
   }
+
+  .disabled,
   .pre {
     background-position: 0 -560px;
     &:hover {
@@ -49,6 +113,7 @@ export default {};
       margin-left: 22px;
     }
   }
+  .disable,
   .next {
     &:hover {
       background-position: -75px -590px;
@@ -57,6 +122,15 @@ export default {};
     span {
       margin-left: 12px;
     }
+  }
+  .disabled,
+  .disable {
+    color: #cacaca;
+    cursor: default;
+    background-position: 0 -590px;
+  }
+  .disable {
+    background-position: -75px -620px;
   }
   .navs {
     display: flex;
