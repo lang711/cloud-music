@@ -2,7 +2,7 @@
   <div class="songMenu">
     <div class="head">
       <div class="head-left">
-        <h2>{{ cat || "全部" }}</h2>
+        <h2>{{ curCat || "全部" }}</h2>
         <div class="select">
           <a href="#" class="btn" @click.prevent="showCat($event)">
             <span>选择分类</span>
@@ -26,6 +26,7 @@
                     <a
                       href="#"
                       @click.prevent="goTo('discover/playlist', cat)"
+                      :class="{ select: cat.name === curCat }"
                       >{{ cat.name }}</a
                     >
                     <span class="line">|</span>
@@ -39,7 +40,9 @@
       <a
         href="#"
         class="hot"
-        @click.prevent="goTo('discover/playlist', { order: 'hot', name: cat })"
+        @click.prevent="
+          goTo('discover/playlist', { order: 'hot', name: cat, page })
+        "
         >热门</a
       >
     </div>
@@ -79,7 +82,13 @@
         </p>
       </li>
     </ul>
-    <Navigation></Navigation>
+    <Navigation
+      class="navigation"
+      :total="total"
+      :page="page"
+      @changePage="
+        goTo('discover/playlist', { order, name: cat, page: $event })
+      "></Navigation>
   </div>
 </template>
 
@@ -91,14 +100,14 @@ export default {
     return {
       playlists: [],
       categorys: [],
-      cat: "",
-      page: 0,
+      curCat: "",
+      page: 1,
       visible: false,
       order: "",
+      total: 0,
     };
   },
   mounted() {
-    console.log(this.$route);
     let query = this.$route.query;
     this.getPlaylist(query);
     document.addEventListener(
@@ -111,13 +120,14 @@ export default {
   methods: {
     getPlaylist(query) {
       let { cat, page, order } = query;
-      this.cat = cat;
-      this.page = page;
-      this.order = order;
+      this.curCat = cat;
+      this.page = +page || 1;
+      this.order = order || "";
       this.$api.getPlaylist(cat, page, order).then((res) => {
         console.log(res);
         if (res.code === 200) {
           this.playlists = res.playlists;
+          this.total = res.total;
         }
       });
     },
@@ -158,6 +168,7 @@ export default {
           query: {
             cat: obj.name,
             order: obj.order,
+            page: obj.page,
           },
         });
       } else if (target === "playlist") {
@@ -348,6 +359,11 @@ export default {
                   &:hover {
                     text-decoration: underline;
                   }
+                  &.select {
+                    background: #a7a7a7;
+                    color: #fff;
+                    padding: 2px 6px;
+                  }
                 }
               }
             }
@@ -458,6 +474,9 @@ export default {
         margin-right: 3px;
       }
     }
+  }
+  .navigation {
+    margin: 20px 0;
   }
 }
 </style>

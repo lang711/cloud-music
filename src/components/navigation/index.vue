@@ -47,11 +47,24 @@
 
 <script>
 export default {
+  props: {
+    total: {
+      type: Number,
+      required: true,
+    },
+    step: {
+      default: 5,
+    },
+    page: {
+      default: 1,
+      type: Number,
+    },
+  },
   data() {
     return {
-      total: 5,
-      step: 5,
-      curSelect: 3,
+      // total: 5,
+      // step: 5,
+      curSelect: this.page,
     };
   },
   computed: {
@@ -66,6 +79,7 @@ export default {
       }
     },
     end() {
+      if (this.total === 0) return 0;
       if (this.total - 2 < this.step) {
         return this.total - 2;
       } else {
@@ -83,6 +97,12 @@ export default {
       } else {
         this.curSelect = n;
       }
+      this.$emit("changePage", this.curSelect);
+    },
+  },
+  watch: {
+    page(newVal) {
+      this.curSelect = newVal;
     },
   },
 };

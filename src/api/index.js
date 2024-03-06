@@ -53,6 +53,8 @@ export const getPlaylistCat = () => {
 // 歌单
 export const getPlaylist = (cat = "all", offset = 0, order) => {
   return request(
-    `/top/playlist?cat=${cat}&limit=35&offset=${35 * offset}&order=${order}`
+    `/top/playlist?cat=${cat}&limit=35&offset=${
+      offset && 35 * (offset - 1)
+    }&order=${order}`
   );
 };
