@@ -8,6 +8,9 @@ const mutations = {
   SETALLRANK(state, ranks) {
     state.ranks = ranks;
   },
+  SETHOTALBUM(state, albums) {
+    state.hotAlbums = albums;
+  },
 };
 
 const actions = {};
@@ -20,6 +23,7 @@ const store = new Vuex.Store({
   getters,
   state: {
     ranks: [],
+    hotAlbums: [],
   },
 });
 

@@ -54,6 +54,7 @@ export default {
   mounted() {
     this.$api.getNewAlbum().then((res) => {
       if (res.code === 200) {
+        this.$store.commit("SETHOTALBUM", res.albums);
         this.albums = res.albums;
         this.$nextTick(() => {
           new Swiper(".swiper-container", {

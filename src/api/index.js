@@ -51,10 +51,19 @@ export const getPlaylistCat = () => {
 };
 
 // 歌单
-export const getPlaylist = (cat = "all", offset = 0, order) => {
+export const getPlaylist = (cat = "all", offset = 0, order, limit) => {
   return request(
-    `/top/playlist?cat=${cat}&limit=35&offset=${
+    `/top/playlist?cat=${cat}&limit=${limit}&offset=${
       offset && 35 * (offset - 1)
     }&order=${order}`
+  );
+};
+
+// 全部新碟
+export const getAllAlbum = (area, offset = 0, limit) => {
+  return request(
+    `/album/new?area=${area}&limit=${limit}&offset=${
+      offset && 35 * (offset - 1)
+    }`
   );
 };

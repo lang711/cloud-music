@@ -3,19 +3,31 @@
     <Container title="热门新碟">
       <template #content>
         <ul class="albums">
-          <li v-for="n in 10">
+          <li v-for="album in hotAlbums" :key="album.id">
             <div class="imgBox">
-              <img
-                src="https://p1.music.126.net/6s6u8ZTh29dxuu7MC4u8hw==/109951169377079752.jpg?param=130y130"
-                alt="" />
-              <a href="#" class="mask"></a>
+              <img :src="`${album.picUrl}?param=130y130`" alt="" />
+              <a
+                href="#"
+                class="mask"
+                :title="album.name"
+                @click.prevent="goTo('album', album)"></a>
               <a href="#" class="icon icon-play" title="播放"></a>
             </div>
             <p class="name">
-              <a href="#">Djesse Vol. 4</a>
+              <a
+                href="#"
+                :title="album.name"
+                @click.prevent="goTo('album', album)"
+                >{{ album.name }}</a
+              >
             </p>
             <p class="author">
-              <a href="#">Jacob Collier</a>
+              <a
+                href="#"
+                :title="album.artist.name"
+                @click.prevent="goTo('artist', album.artist)"
+                >{{ album.artist.name }}</a
+              >
             </p>
           </li>
         </ul>
@@ -24,49 +36,126 @@
     <Container title="全部新碟">
       <template #navs>
         <ul class="navs">
-          <li>
-            <a>全部</a>
-          </li>
-          <li>
-            <a>全部</a>
-          </li>
-          <li>
-            <a>全部</a>
-          </li>
-          <li>
-            <a>全部</a>
-          </li>
-          <li>
-            <a>全部</a>
+          <li v-for="(area, index) in areas" :key="index">
+            <a href="#" @click.prevent="goTo('discover/album', area)">{{
+              area.chinese
+            }}</a>
           </li>
         </ul>
       </template>
       <template #content>
         <ul class="albums">
-          <li v-for="n in 35">
+          <li v-for="album in allAlbums" :key="album.id">
             <div class="imgBox">
-              <img
-                src="https://p1.music.126.net/6s6u8ZTh29dxuu7MC4u8hw==/109951169377079752.jpg?param=130y130"
-                alt="" />
-              <a href="#" class="mask"></a>
+              <img :src="`${album.picUrl}?param=130y130`" alt="" />
+              <a
+                href="#"
+                class="mask"
+                :title="album.name"
+                @click.prevent="goTo('album', album)"></a>
               <a href="#" class="icon icon-play" title="播放"></a>
             </div>
             <p class="name">
-              <a href="#">Djesse Vol. 4</a>
+              <a
+                href="#"
+                :title="album.name"
+                @click.prevent="goTo('album', album)"
+                >{{ album.name }}</a
+              >
             </p>
             <p class="author">
-              <a href="#">Jacob Collier</a>
+              <span v-for="(artist, i) in album.artists" :key="artist.id">
+                <a
+                  href="#"
+                  :title="artist.name"
+                  @click.prevent="goTo('artist', artist)"
+                  >{{ artist.name }}</a
+                >
+                <span v-show="i !== album.artists.length - 1">/</span>
+              </span>
             </p>
           </li>
         </ul>
-        <Navigation :total="15" class="navigation"></Navigation>
+        <Navigation
+          :total="Math.ceil(total / limit)"
+          class="navigation"
+          :page="page"
+          @changePage="
+            goTo('discover/album', { english: area, page: $event })
+          "></Navigation>
       </template>
     </Container>
   </div>
 </template>
 
 <script>
-export default {};
+export default {
+  data() {
+    return {
+      hotAlbums: [],
+      allAlbums: [],
+      area: "",
+      page: 1,
+      areas: [
+        { english: "ALL", chinese: "全部" },
+        { english: "ZH", chinese: "华语" },
+        { english: "EA", chinese: "欧美" },
+        { english: "KR", chinese: "韩国" },
+        { english: "JP", chinese: "日本" },
+      ],
+      limit: 35,
+      total: 0,
+    };
+  },
+  mounted() {
+    let hotAlbums = this.$store.state.hotAlbums;
+    if (!hotAlbums.length) {
+      this.$api.getNewAlbum().then((res) => {
+        if (res.code === 200) {
+          this.hotAlbums = res.albums;
+        }
+      });
+    } else {
+      this.hotAlbums = hotAlbums;
+    }
+    let query = this.$route.query;
+    this.getAllAlbum(query);
+  },
+  methods: {
+    getAllAlbum(query) {
+      let { area, page } = query;
+      this.area = area;
+      this.page = +page || 1;
+      this.$api.getAllAlbum(area, page, this.limit).then((res) => {
+        console.log(res);
+        if (res.code === 200) {
+          this.allAlbums = res.albums;
+          this.total = res.total;
+        }
+      });
+    },
+    goTo(target, obj) {
+      if (target === "discover/album") {
+        this.$router.push({
+          path: `/${target}`,
+          query: {
+            area: obj.english,
+            page: obj.page,
+          },
+        });
+      } else if (target === "album") {
+        this.$router.push(`/${target}?id=${obj.id}`);
+      } else if (target === "artist") {
+        this.$router.push(`/${target}?id=${obj.id}`);
+      }
+    },
+  },
+  watch: {
+    $route(newVal) {
+      this.getAllAlbum(newVal.query);
+    },
+  },
+};
 </script>
 
 <style lang="less" scoped>
@@ -146,6 +235,9 @@ export default {};
         }
         &.author {
           color: #666;
+          a {
+            margin: 0 3px;
+          }
         }
         &.name {
           font-size: 14px;

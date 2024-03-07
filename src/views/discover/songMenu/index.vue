@@ -41,7 +41,7 @@
         href="#"
         class="hot"
         @click.prevent="
-          goTo('discover/playlist', { order: 'hot', name: cat, page })
+          goTo('discover/playlist', { order: 'hot', name: curCat, page })
         "
         >热门</a
       >
@@ -84,10 +84,10 @@
     </ul>
     <Navigation
       class="navigation"
-      :total="total"
+      :total="Math.ceil(total / limit)"
       :page="page"
       @changePage="
-        goTo('discover/playlist', { order, name: cat, page: $event })
+        goTo('discover/playlist', { order, name: curCat, page: $event })
       "></Navigation>
   </div>
 </template>
@@ -105,6 +105,7 @@ export default {
       visible: false,
       order: "",
       total: 0,
+      limit: 35,
     };
   },
   mounted() {
@@ -123,7 +124,7 @@ export default {
       this.curCat = cat;
       this.page = +page || 1;
       this.order = order || "";
-      this.$api.getPlaylist(cat, page, order).then((res) => {
+      this.$api.getPlaylist(cat, page, order, this.limit).then((res) => {
         console.log(res);
         if (res.code === 200) {
           this.playlists = res.playlists;
