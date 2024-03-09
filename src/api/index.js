@@ -67,3 +67,24 @@ export const getAllAlbum = (area, offset = 0, limit) => {
     }`
   );
 };
+
+// 获取音乐播放url
+export const getPlayUrl = (id) => {
+  return request(`/song/url?id=${id}`);
+};
+
+// 下载音乐
+export const downloadMusic = (url, fileName) => {
+  var xhr = new XMLHttpRequest();
+  xhr.responseType = "blob";
+  xhr.onload = function () {
+    var aTag = document.createElement("a");
+    aTag.href = URL.createObjectURL(xhr.response);
+    aTag.download = fileName;
+    document.body.appendChild(aTag);
+    aTag.click();
+    document.body.removeChild(aTag);
+  };
+  xhr.open("GET", url);
+  xhr.send();
+};

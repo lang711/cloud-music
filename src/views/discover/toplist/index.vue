@@ -83,7 +83,12 @@
                   <a href="#" class="icon icon-add" title="添加到播放列表"></a>
                   <a href="#" class="icon icon-collect" title="收藏"></a>
                   <a href="#" class="icon icon-share" title="分享"></a>
-                  <a href="#" class="icon icon-download" title="下载"></a>
+                  <a
+                    href="#"
+                    class="icon icon-download"
+                    title="下载"
+                    @click.prevent="download(song)">
+                  </a>
                 </div>
               </div>
               <div class="singer">
@@ -149,6 +154,17 @@ export default {
       } else if (target === "artist") {
         this.$router.push(`/${target}?id=${obj.id}`);
       }
+    },
+    download(song) {
+      this.$api
+        .getPlayUrl(song.id)
+        .then((res) => {
+          let { url } = res.data[0];
+          return url;
+        })
+        .then((url) => {
+          this.$api.downloadMusic(url, `${song.name}.mp3`);
+        });
     },
   },
   watch: {
