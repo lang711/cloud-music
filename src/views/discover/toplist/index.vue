@@ -1,49 +1,21 @@
 <template>
   <div class="toplist">
-    <div class="aside">
-      <h2>云音乐特色榜</h2>
-      <ul class="ranks">
-        <li v-for="n in 4" :key="n">
-          <a href="#" :class="{ active: n == 1 }">
-            <img
-              src="https://p1.music.126.net/pcYHpMkdC69VVvWiynNklA==/109951166952713766.jpg?param=40y40"
-              alt="" />
-            <div class="right">
-              <p class="title">飙升榜</p>
-              <p class="update">刚刚更新</p>
-            </div>
-          </a>
-        </li>
-      </ul>
-      <h2>全球媒体榜</h2>
-      <ul class="ranks">
-        <li>
-          <a href="#">
-            <img
-              src="https://p1.music.126.net/pcYHpMkdC69VVvWiynNklA==/109951166952713766.jpg?param=40y40"
-              alt="" />
-            <div class="right">
-              <p class="title">飙升榜</p>
-              <p class="update">刚刚更新</p>
-            </div>
-          </a>
-        </li>
-      </ul>
-    </div>
+    <Aside @changeRank="curRank = $event"></Aside>
+
     <div class="content">
       <div class="top">
         <div class="logo">
-          <img
-            src="https://p1.music.126.net/pcYHpMkdC69VVvWiynNklA==/109951166952713766.jpg?param=150y150"
-            alt="" />
+          <img :src="`${curRank.coverImgUrl}?param=150y150`" alt="" />
           <span class="mask"></span>
         </div>
         <div class="top-right">
-          <h2>飙升榜</h2>
+          <h2>{{ curRank.name }}</h2>
           <div class="update">
             <i class="icon icon-watch"></i>
-            <span class="clearly">最近更新：03月07日</span>
-            <span class="new">（刚刚更新）</span>
+            <span class="clearly"
+              >最近更新：{{ curRank.updateTime | date }}</span
+            >
+            <span class="new">（{{ curRank.updateFrequency }}）</span>
           </div>
           <div class="btns">
             <div class="play">
@@ -53,10 +25,14 @@
               </a>
               <a href="" class="icon icon-add" title="添加到播放列表"></a>
             </div>
-            <a href="#" class="icon icon-collect"> (4103478) </a>
-            <a href="#" class="icon icon-share">(15636)</a>
+            <a href="#" class="icon icon-collect">
+              ({{ playlist.subscribedCount }})
+            </a>
+            <a href="#" class="icon icon-share">({{ playlist.shareCount }})</a>
             <a href="#" class="icon icon-download">下载</a>
-            <a href="#" class="icon icon-comment">(220723)</a>
+            <a href="#" class="icon icon-comment"
+              >({{ playlist.commentCount }})</a
+            >
           </div>
         </div>
       </div>
@@ -64,9 +40,12 @@
         <div class="title">
           <h3>
             歌曲列表
-            <span class="song-num">100首歌</span>
+            <span class="song-num">{{ playlist.trackCount }}首歌</span>
           </h3>
-          <span class="song-playcount">播放：<em>5847658496</em>次</span>
+          <span class="song-playcount"
+            >播放：<em>{{ playlist.playCount }}</em
+            >次</span
+          >
         </div>
         <div class="body">
           <div class="head">
@@ -76,9 +55,9 @@
             <div class="singer">歌手</div>
           </div>
           <ul class="songs">
-            <li v-for="n in 20" :key="n">
+            <li v-for="(song, index) in playlist.tracks" :key="song.id">
               <div class="order">
-                <span class="num">4</span>
+                <span class="num">{{ index + 1 }}</span>
                 <div class="icon">
                   <i></i>
                   <span>19</span>
@@ -86,11 +65,20 @@
               </div>
               <div class="name">
                 <i class="icon-play" title="播放"></i>
-                <a href="#">底牌</a>
-                <span> - (在我耳边温柔地哼)</span>
+                <div class="txt">
+                  <a
+                    href="#"
+                    :title="song.name + getSongDec(song)"
+                    @click.prevent="goTo('song', song)"
+                    >{{ song.name }}</a
+                  >
+                  <span :title="getSongDec(song).slice(3)">{{
+                    getSongDec(song)
+                  }}</span>
+                </div>
               </div>
               <div class="duration">
-                <span>03:00</span>
+                <span>{{ song.dt | hour }}</span>
                 <div class="icons">
                   <a href="#" class="icon icon-add" title="添加到播放列表"></a>
                   <a href="#" class="icon icon-collect" title="收藏"></a>
@@ -99,7 +87,15 @@
                 </div>
               </div>
               <div class="singer">
-                <a href="#">Max/邹沛沛</a>
+                <span v-for="(author, i) in song.ar" :key="author.id">
+                  <a
+                    href="#"
+                    :title="author.name"
+                    @click.prevent="goTo('artist', author)"
+                    >{{ author.name }}</a
+                  >
+                  <span v-show="i !== song.ar.length - 1">/</span>
+                </span>
               </div>
             </li>
           </ul>
@@ -110,59 +106,94 @@
 </template>
 
 <script>
-export default {};
+// 缓存歌名描述
+let cache = new Map();
+import Aside from "./aside";
+export default {
+  data() {
+    return {
+      curRank: {},
+      playlist: {},
+    };
+  },
+  components: {
+    Aside,
+  },
+  mounted() {},
+  methods: {
+    getPlaylist(rank) {
+      this.$api.getPlaylistDetail(rank.id).then((res) => {
+        if (res.code === 200) {
+          this.playlist = res.playlist;
+        }
+      });
+    },
+    getSongDec(song) {
+      if (cache.has(song)) {
+        return cache.get(song);
+      } else {
+        let { tns, alia } = song;
+        let str = "";
+        if (tns?.length) {
+          str = ` - (${tns.join("")})`;
+        } else if (alia?.length) {
+          str = ` - (${alia.join("")})`;
+        }
+        cache.set(song, str);
+        return str;
+      }
+    },
+    goTo(target, obj) {
+      if (target === "song") {
+        this.$router.push(`/${target}?id=${obj.id}`);
+      } else if (target === "artist") {
+        this.$router.push(`/${target}?id=${obj.id}`);
+      }
+    },
+  },
+  watch: {
+    curRank(newVal, oldVal) {
+      this.getPlaylist(newVal);
+    },
+  },
+  filters: {
+    date(timestamp) {
+      const date = new Date(timestamp);
+      let year = date.getFullYear();
+      let month = date.getMonth() + 1;
+      let day = date.getDate();
+      return `${year}年${month}月${day}日`;
+    },
+    hour(millisecond) {
+      let second = Math.floor(millisecond / 1000);
+      let minute = Math.floor(second / 60);
+      second = second % 60;
+      return (
+        minute.toString().padStart(2, "0") +
+        ":" +
+        second.toString().padEnd(2, "0")
+      );
+    },
+  },
+  beforeDestroy() {
+    cache = new Map();
+  },
+};
 </script>
 
 <style lang="less" scoped>
 .toplist {
-  width: 982px;
+  width: 980px;
   margin: 0 auto;
-  height: 1000px;
-  box-sizing: border-box;
   background: url(https://s2.music.126.net/style/web2/img/frame/wrap3.png?2e52fd28cd57b61de252c79b06acd70c)
     repeat-y center 0;
   border-left: 1px solid #d3d3d3;
   border-right: 1px solid #d3d3d3;
   display: flex;
-  .aside {
-    width: 240px;
-    padding-top: 20px;
-    h2 {
-      font-size: 14px;
-      padding: 2px 10px 13px 15px;
-      color: #000;
-      margin-top: 20px;
-    }
-    .ranks {
-      a {
-        display: flex;
-        height: 42px;
-        padding: 12px 0 8px 20px;
-
-        &.active {
-          background: #e6e6e6;
-        }
-        img {
-          width: 40px;
-          height: 40px;
-        }
-        .right {
-          padding-left: 10px;
-          .title {
-            width: 150px;
-            color: #000;
-            margin: 4px 0 10px;
-          }
-          .update {
-            color: #999;
-          }
-        }
-      }
-    }
-  }
   .content {
-    flex: 1;
-    padding: 40px;
+    width: 740px;
+    box-sizing: border-box;
+    padding: 40px 30px 40px 40px;
     .top {
       display: flex;
       color: #333;
@@ -337,7 +368,6 @@ export default {};
       }
       .body {
         border: 1px solid #d9d9d9;
-
         .head {
           display: flex;
           color: #666;
@@ -379,7 +409,7 @@ export default {};
           }
         }
         .songs {
-          li > {
+          li {
             display: flex;
             line-height: 18px;
             &:nth-child(even) {
@@ -428,10 +458,19 @@ export default {};
               }
             }
             .name {
-              flex: 1;
               display: flex;
+              flex: 1;
               padding: 6px 10px;
               line-height: 18px;
+              overflow: hidden;
+              color: #999;
+
+              .txt {
+                max-width: 80%;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+              }
               .icon-play {
                 width: 17px;
                 height: 17px;
@@ -506,6 +545,9 @@ export default {};
               width: 26%;
               padding: 6px 10px;
               color: #333;
+              overflow: hidden;
+              text-overflow: ellipsis;
+              white-space: nowrap;
               a:hover {
                 text-decoration: underline;
               }
