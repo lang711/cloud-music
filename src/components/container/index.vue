@@ -42,26 +42,6 @@ export default {
         font-weight: normal;
       }
     }
-    .head-right {
-      margin-top: 9px;
-      position: relative;
-      .icon {
-        position: absolute;
-        width: 12px;
-        height: 12px;
-        background: url(https://s2.music.126.net/style/web2/img/index/index.png?5e9995a753a7b0a1e0d3944275f9c1a1);
-        background-position: 0 -240px;
-        right: 1px;
-        top: 4px;
-      }
-      .more {
-        display: block;
-        margin: 2px 17px 0 0;
-        &:hover {
-          text-decoration: underline;
-        }
-      }
-    }
   }
 }
 </style>
