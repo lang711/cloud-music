@@ -25,7 +25,7 @@ export default {
       limit: 50,
       page: 0,
       isOver: false,
-      bottom: 300,
+      bottom: 500,
     };
   },
   mounted() {
