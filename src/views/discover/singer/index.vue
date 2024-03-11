@@ -14,6 +14,7 @@
       </div>
     </div>
     <div class="content">
+      <router-view></router-view>
       <Container title="入驻歌手">
         <template #right>
           <a href="#" class="more">更多 ></a>

@@ -51,6 +51,20 @@ const routes = [
       {
         path: "artist",
         component: () => import("views/discover/singer"),
+        children: [
+          {
+            path: "",
+            component: () => import("views/discover/singer/home"),
+          },
+          {
+            path: "cat",
+            component: () => import("views/discover/singer/catSinger"),
+          },
+          {
+            path: "signed",
+            component: () => import("views/discover/singer/hotSinger"),
+          },
+        ],
       },
       {
         path: "album",
