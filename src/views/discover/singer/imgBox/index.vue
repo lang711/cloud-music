@@ -72,7 +72,13 @@ export default {
     margin-top: 7px;
     color: #000;
     align-items: center;
+    width: 130px;
+    overflow: hidden;
     .name {
+      max-width: 80%;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      white-space: nowrap;
       &:hover {
         text-decoration: underline;
       }

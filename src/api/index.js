@@ -88,3 +88,8 @@ export const downloadMusic = (url, fileName) => {
 export const getHotSinger = (page = 0, limit) => {
   return request(`/top/artists?offset=${page * limit}&limit=${limit}`);
 };
+
+// 歌手分类列表
+export const getCatSinger = (type, area, initial,limit) => {
+  return request(`/artist/list?type=${type}&area=${area}&initial=${initial}&limit=${limit}`);
+};

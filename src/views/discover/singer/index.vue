@@ -20,14 +20,14 @@
         </ul>
       </div>
       <div class="wrap" v-for="(nav, i) in navs" :key="i">
-        <h2>{{ nav.value }}</h2>
+        <h2>{{ nav.name }}</h2>
         <ul class="cates">
           <li v-for="(cat, index) in nav.cats" :key="index">
             <a
               href="#"
               :class="{ active: matchNav(cat) }"
-              @click.prevent="goTo(cat)"
-              >{{ nav.value
+              @click.prevent="goTo(nav, cat)"
+              >{{ nav.name
               }}{{
                 index === 0 ? "男歌手" : index === 1 ? "女歌手" : "组合/乐队"
               }}</a
@@ -43,44 +43,50 @@
 </template>
 
 <script>
+export const navs = [
+  {
+    name: "华语",
+    area: 7,
+    cats: ["1001", "1002", "1003"],
+  },
+  {
+    name: "欧美",
+    area: 96,
+    cats: ["2001", "2002", "2003"],
+  },
+  {
+    name: "日本",
+    area: 8,
+    cats: ["6001", "6002", "6003"],
+  },
+  {
+    name: "韩国",
+    area: 16,
+    cats: ["7001", "7002", "7003"],
+  },
+  {
+    name: "其他",
+    area: 0,
+    cats: ["4001", "4002", "4003"],
+  },
+];
 export default {
   data() {
     return {
-      navs: [
-        {
-          value: "华语",
-          path: "/cat",
-          cats: ["1001", "1002", "1003"],
-        },
-        {
-          value: "欧美",
-          path: "/cat",
-          cats: ["2001", "2002", "2003"],
-        },
-        {
-          value: "日本",
-          path: "/cat",
-          cats: ["6001", "6002", "6003"],
-        },
-        {
-          value: "韩国",
-          path: "/cat",
-          cats: ["7001", "7002", "7003"],
-        },
-        {
-          value: "其他",
-          path: "/cat",
-          cats: ["4001", "4002", "4003"],
-        },
-      ],
-      cat: "",
+      navs: navs,
       defaultPath: "/discover/artist/cat",
     };
   },
-  
+
   methods: {
-    goTo(id) {
-      this.$router.push(`/discover/artist/cat?id=${id}`);
+    goTo(nav, cat) {
+      this.curNav = nav;
+      this.$router.push({
+        path: `/discover/artist/cat`,
+        query: {
+          id: cat,
+        },
+      });
     },
     matchNav(cat) {
       let { path, query } = this.$route;
