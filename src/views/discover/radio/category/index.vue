@@ -127,7 +127,7 @@ export default {};
         color: #333;
         h3 {
           line-height: 64px;
-          font-size: 19px;
+          font-size: 18px;
         }
         a:hover {
           text-decoration: underline;
