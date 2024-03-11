@@ -27,9 +27,10 @@ export default {
     };
   },
   mounted() {
-    this.$api.getHotSinger().then((res) => {
+    this.$api.getHotSinger(0, 100).then((res) => {
       if (res.code === 200) {
         this.singers = res.artists.slice(0, 5);
+        this.$store.commit("SETHOTSINGER", res.artists);
       }
     });
   },

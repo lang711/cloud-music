@@ -35,11 +35,6 @@ export const getPlaylistDetail = (id) => {
   return request(`/playlist/detail?id=${id}`);
 };
 
-// 热门歌手
-export const getHotSinger = () => {
-  return request("/top/artists");
-};
-
 // 热门主播
 export const getHotAnchor = () => {
   return request("/dj/toplist/popular");
@@ -87,4 +82,9 @@ export const downloadMusic = (url, fileName) => {
   };
   xhr.open("GET", url);
   xhr.send();
+};
+
+// 热门歌手
+export const getHotSinger = (page = 0, limit) => {
+  return request(`/top/artists?offset=${page * limit}&limit=${limit}`);
 };
