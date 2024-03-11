@@ -51,6 +51,16 @@ const routes = [
       {
         path: "djradio",
         component: () => import("views/discover/radio"),
+        children: [
+          {
+            path: "",
+            component: () => import("views/discover/radio/home"),
+          },
+          {
+            path: "category",
+            component: () => import("views/discover/radio/category"),
+          },
+        ],
       },
       {
         path: "artist",
