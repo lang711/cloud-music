@@ -7,16 +7,20 @@
         </template>
         <template #content>
           <ul class="rank">
-            <li v-for="n in 10" :key="n">
+            <li v-for="program in programs" :key="program.id">
               <a href="#" class="mask" title="播放">
-                <img
-                  src="https://p2.music.126.net/gkPPnZ3hw0Up-taGApztTA==/109951169392653108.jpg?param=40x40"
-                  alt="" />
+                <img :src="`${program.coverUrl}?param=40x40`" alt="" />
                 <i class="icon icon-play"></i>
               </a>
               <div class="cont">
-                <h3><a href="#">《味道》零延迟的情歌体验| 金曲典藏计划</a></h3>
-                <p class="name"><a href="#">遗珠三品</a></p>
+                <h3>
+                  <a href="#" :title="program.name">{{ program.name }}</a>
+                </h3>
+                <p class="name">
+                  <a href="#" :title="program.radio.name">{{
+                    program.radio.name
+                  }}</a>
+                </p>
               </div>
               <a href="#" class="btn">音乐播客</a>
             </li>
@@ -29,16 +33,25 @@
         </template>
         <template #content>
           <ul class="rank">
-            <li v-for="n in 10" :key="n">
+            <li v-for="rank in programRank" :key="rank.rank">
+              <span class="order" :class="{ top: rank.rank <= 3 }">{{
+                rank.rank
+              }}</span>
               <a href="#" class="mask" title="播放">
-                <img
-                  src="https://p2.music.126.net/gkPPnZ3hw0Up-taGApztTA==/109951169392653108.jpg?param=40x40"
-                  alt="" />
+                <img :src="`${rank.program.coverUrl}?param=40x40`" alt="" />
                 <i class="icon icon-play"></i>
               </a>
               <div class="cont">
-                <h3><a href="#">《味道》零延迟的情歌体验| 金曲典藏计划</a></h3>
-                <p class="name"><a href="#">遗珠三品</a></p>
+                <h3>
+                  <a href="#" :title="rank.program.name">{{
+                    rank.program.name
+                  }}</a>
+                </h3>
+                <p class="name">
+                  <a href="#" :title="rank.program.radio.name">{{
+                    rank.program.radio.name
+                  }}</a>
+                </p>
               </div>
               <a href="#" class="btn">音乐播客</a>
             </li>
@@ -47,22 +60,22 @@
       </Container>
     </div>
     <ul class="category">
-      <li v-for="n in 5" :key="n">
-        <Container title="音乐播客 · 电台">
+      <li v-for="(cat, index) in cats" :key="index">
+        <Container :title="`${cat.name} · 电台`">
           <template #right>
             <a href="#" class="more">更多 ></a>
           </template>
           <template #content>
             <ul class="list">
-              <li v-for="n in 4" :key="n">
+              <li v-for="radio in radios[index]" :key="radio.id">
                 <a href="#" class="mask">
-                  <img
-                    src="	https://p1.music.126.net/Bwh9Yh5CodMWLQA6nTZIGA==/109951168600984382.jpg?param=200y200"
-                    alt="" />
+                  <img :src="`${radio.picUrl}?param=200y200`" alt="" />
                 </a>
                 <div class="dec">
-                  <h3><a href="#">我是一名聊愈师</a></h3>
-                  <p class="detail">离这些熟悉但又陌生的华语音乐，更近一些。</p>
+                  <h3>
+                    <a href="#" :title="radio.name">{{ radio.name }}</a>
+                  </h3>
+                  <p class="detail">{{ radio.rcmdtext }}</p>
                 </div>
               </li>
             </ul>
@@ -74,7 +87,70 @@
 </template>
 
 <script>
-export default {};
+export default {
+  data() {
+    return {
+      programs: [],
+      programRank: [],
+      cats: [
+        {
+          name: "音乐博客",
+          value: 2,
+        },
+        {
+          name: "生活",
+          value: 6,
+        },
+        {
+          name: "情感",
+          value: 3,
+        },
+        {
+          name: "创作翻唱",
+          value: 2001,
+        },
+        {
+          name: "知识",
+          value: 11,
+        },
+      ],
+      radios: [],
+    };
+  },
+  mounted() {
+    this.$api.getRecommendProgram().then((res) => {
+      console.log(res);
+      if (res.code === 200) {
+        this.programs = res.programs;
+      }
+    });
+    this.$api.getProgramRank().then((res) => {
+      console.log(res);
+      if (res.code === 200) {
+        this.programRank = res.toplist;
+      }
+    });
+    Promise.all(this.cats.map((cat) => this.getRadio(cat.value))).then(
+      (res) => {
+        this.radios = res.map((radio) => radio.slice(0, 4));
+      }
+    );
+  },
+  methods: {
+    getRadio(type) {
+      return new Promise((resolve, reject) => {
+        this.$api
+          .getNewRadio(type)
+          .then((res) => {
+            if (res.code === 200) {
+              resolve(res.djRadios);
+            }
+          })
+          .catch(reject);
+      });
+    },
+  },
+};
 </script>
 
 <style lang="less" scoped>
@@ -89,10 +165,6 @@ export default {};
   .program {
     display: flex;
     justify-content: space-between;
-    .container {
-      margin-bottom: 35px;
-    }
-
     .rank {
       width: 426px;
       border: 1px solid #e2e2e2;
@@ -110,6 +182,13 @@ export default {};
           .mask .icon {
             display: block;
           }
+        }
+        .order {
+          width: 26px;
+          text-align: right;
+        }
+        .top {
+          color: #da4545;
         }
         .mask {
           position: relative;
@@ -141,6 +220,7 @@ export default {};
             white-space: nowrap;
             font-weight: normal;
             color: #333;
+            font-size: 12px;
           }
           a:hover {
             text-decoration: underline;
@@ -150,6 +230,7 @@ export default {};
           border: 1px solid #999;
           padding: 0 6px;
           line-height: 16px;
+          margin-left: 10px;
           &:hover {
             border-color: #000;
             color: #000;
@@ -159,6 +240,9 @@ export default {};
     }
   }
   .category {
+    .container {
+      margin-top: 35px;
+    }
     .list {
       display: flex;
       flex-wrap: wrap;

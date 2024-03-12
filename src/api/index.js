@@ -90,6 +90,28 @@ export const getHotSinger = (page = 0, limit) => {
 };
 
 // 歌手分类列表
-export const getCatSinger = (type, area, initial,limit) => {
-  return request(`/artist/list?type=${type}&area=${area}&initial=${initial}&limit=${limit}`);
+export const getCatSinger = (type, area, initial, limit) => {
+  return request(
+    `/artist/list?type=${type}&area=${area}&initial=${initial}&limit=${limit}`
+  );
 };
+
+// 推荐节目
+export const getRecommendProgram = () => {
+  return request("/program/recommend");
+};
+
+// 电台分类
+export const getRadioCat = () => {
+  return request("/dj/catelist");
+};
+
+// 节目榜
+export const getProgramRank = (limit = 10) => {
+  return request(`/dj/program/toplist?limit=${limit}`);
+};
+
+// 优秀新电台
+export const getNewRadio=(type)=>{
+  return request(`/dj/recommend/type?type=${type}`);
+}

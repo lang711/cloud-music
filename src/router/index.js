@@ -60,6 +60,14 @@ const routes = [
             path: "category",
             component: () => import("views/discover/radio/category"),
           },
+          {
+            path: "recommend",
+            component: () => import("views/discover/radio/recommend"),
+          },
+          {
+            path: "rank",
+            component: () => import("views/discover/radio/rank"),
+          },
         ],
       },
       {
