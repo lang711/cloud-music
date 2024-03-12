@@ -8,7 +8,11 @@
           :key="index">
           <ul class="navs">
             <li v-for="cat in cats" :key="cat.id">
-              <a href="#" class="cat" @click.prevent="goTo(cat)">
+              <a
+                href="#"
+                class="cat"
+                :class="{ active: curCat.id === cat.id }"
+                @click.prevent="goTo(cat)">
                 <i
                   class="icon"
                   :style="{ backgroundImage: `url(${cat.picWebUrl})` }"></i>
@@ -28,10 +32,14 @@
 <script>
 import Swiper from "swiper";
 import "swiper/dist/css/swiper.min.css";
+// 缓存
+let cache = null;
 export default {
+  props: ["catId"],
   data() {
     return {
       cats: [],
+      curCat: {},
     };
   },
   computed: {
@@ -40,30 +48,66 @@ export default {
     },
   },
   mounted() {
-    this.$api.getRadioCat().then((res) => {
-      if (res.code === 200) {
-        this.$emit("getCat", res.categories);
-        this.cats = res.categories;
-        this.$nextTick(() => {
-          var mySwiper = new Swiper(".mySwiper", {
-            allowTouchMove: false,
-            pagination: {
-              el: ".dots",
-              clickable: true,
-            },
-            navigation: {
-              nextEl: ".next",
-              prevEl: ".pre",
-            },
-          });
+    this.getRadioCat().then((res) => {
+      this.$nextTick(() => {
+        var mySwiper = new Swiper(".mySwiper", {
+          allowTouchMove: false,
+          pagination: {
+            el: ".dots",
+            clickable: true,
+          },
+          navigation: {
+            nextEl: ".next",
+            prevEl: ".pre",
+          },
         });
-      }
+        this.swiper = mySwiper;
+      });
     });
   },
   methods: {
     goTo(cat) {
+      this.curCat = cat;
       this.$router.push(`/discover/djradio/category?id=${cat.id}`);
     },
+    getRadioCat() {
+      return new Promise((resolve, reject) => {
+        if (cache) {
+          this.$emit("getCat", cache);
+          this.cats = cache;
+          resolve(cache);
+        } else {
+          this.$api
+            .getRadioCat()
+            .then((res) => {
+              if (res.code === 200) {
+                cache = res.categories;
+                this.$emit("getCat", res.categories);
+                this.cats = res.categories;
+                resolve(res.categories);
+              }
+            })
+            .catch(reject);
+        }
+      });
+    },
+  },
+  watch: {
+    catId(newVal) {
+      this.getRadioCat().then(
+        (cats) =>
+          (this.curCat = cats.find((cat, index) => {
+            if (cat.id == newVal) {
+              this.swiper.slideTo(Math.floor(index / 18), 0, false);
+              return true;
+            }
+            return cat.id == newVal;
+          }))
+      );
+    },
+  },
+  beforeDestroy() {
+    cache = null;
   },
 };
 </script>
@@ -151,6 +195,7 @@ export default {
       background-image: url(https://s2.music.126.net/style/web2/img/index_radio/radio_slide.png?64118a7f06a72ba17b2decdefc54e0cf);
       background-position: 0px 0px;
       background-color: transparent;
+      opacity: 1;
       &:hover {
         background-position: -30px 0px;
         opacity: 1;

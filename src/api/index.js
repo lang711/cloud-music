@@ -112,6 +112,20 @@ export const getProgramRank = (limit = 10) => {
 };
 
 // 优秀新电台
-export const getNewRadio=(type)=>{
+export const getNewRadio = (type) => {
   return request(`/dj/recommend/type?type=${type}`);
-}
+};
+
+// 热门电台排行榜
+export const getHotRadio = (id, limit, page) => {
+  return request(
+    `/dj/radio/hot?cateId=${id}&limit=${limit}&offset=${(page - 1) * limit}`
+  );
+};
+
+// 热门电台
+export const getRiseRadio = (limit, page) => {
+  return request(
+    `/dj/toplist?type=new&limit=${limit}&offset=${(page - 1) * limit}`
+  );
+};
