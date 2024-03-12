@@ -33,7 +33,16 @@
                   >
                 </p>
               </div>
-              <a href="#" class="btn">音乐播客</a>
+              <a
+                href="#"
+                class="btn"
+                @click.prevent="
+                  goTo('discover/djradio/category', {
+                    id: program.radio.categoryId,
+                  })
+                "
+                >{{ program.radio.category }}</a
+              >
             </li>
           </ul>
         </template>
@@ -72,7 +81,16 @@
                   >
                 </p>
               </div>
-              <a href="#" class="btn">音乐播客</a>
+              <a
+                href="#"
+                class="btn"
+                @click.prevent="
+                  goTo('discover/djradio/category', {
+                    id: rank.program.radio.categoryId,
+                  })
+                "
+                >{{ rank.program.radio.category }}</a
+              >
             </li>
           </ul>
         </template>

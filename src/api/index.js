@@ -97,8 +97,8 @@ export const getCatSinger = (type, area, initial, limit) => {
 };
 
 // 推荐节目
-export const getRecommendProgram = () => {
-  return request("/program/recommend");
+export const getRecommendProgram = (limit = 10) => {
+  return request("/program/recommend?limit=" + limit);
 };
 
 // 电台分类

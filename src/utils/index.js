@@ -38,3 +38,16 @@ export function randomNums(start = 0, end, count = 1) {
   }
   return nums.length === 1 ? nums[0] : nums;
 }
+
+/**
+ * 解析时间戳
+ * @param {*} timestamp 时间戳
+ * @return {string} 返回解析好的字符串
+ */
+export function parseTimestamp(timestamp) {
+  let day = !timestamp ? new Date() : new Date(timestamp);
+  let year = day.getFullYear();
+  let month = day.getMonth() + 1;
+  let date = day.getDate();
+  return `${year}年${month}月${date}日`;
+}
