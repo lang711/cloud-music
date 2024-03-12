@@ -1,9 +1,12 @@
 <template>
   <div class="home">
+    <Nav @getCat="staticCats = $event"></Nav>
     <div class="program">
       <Container title="推荐节目">
         <template #right>
-          <a href="#" class="more">更多 ></a>
+          <router-link to="/discover/djradio/recommend" class="more"
+            >更多 ></router-link
+          >
         </template>
         <template #content>
           <ul class="rank">
@@ -14,12 +17,20 @@
               </a>
               <div class="cont">
                 <h3>
-                  <a href="#" :title="program.name">{{ program.name }}</a>
+                  <a
+                    href="#"
+                    :title="program.name"
+                    @click.prevent="goTo('program', program)"
+                    >{{ program.name }}</a
+                  >
                 </h3>
                 <p class="name">
-                  <a href="#" :title="program.radio.name">{{
-                    program.radio.name
-                  }}</a>
+                  <a
+                    href="#"
+                    :title="program.radio.name"
+                    @click.prevent="goTo('program', program)"
+                    >{{ program.radio.name }}</a
+                  >
                 </p>
               </div>
               <a href="#" class="btn">音乐播客</a>
@@ -29,7 +40,9 @@
       </Container>
       <Container title="节目排行榜">
         <template #right>
-          <a href="#" class="more">更多 ></a>
+          <router-link to="/discover/djradio/rank" class="more"
+            >更多 ></router-link
+          >
         </template>
         <template #content>
           <ul class="rank">
@@ -43,14 +56,20 @@
               </a>
               <div class="cont">
                 <h3>
-                  <a href="#" :title="rank.program.name">{{
-                    rank.program.name
-                  }}</a>
+                  <a
+                    href="#"
+                    :title="rank.program.name"
+                    @click.prevent="goTo('program', rank.program)"
+                    >{{ rank.program.name }}</a
+                  >
                 </h3>
                 <p class="name">
-                  <a href="#" :title="rank.program.radio.name">{{
-                    rank.program.radio.name
-                  }}</a>
+                  <a
+                    href="#"
+                    :title="rank.program.radio.name"
+                    @click.prevent="goTo('program', rank.program)"
+                    >{{ rank.program.radio.name }}</a
+                  >
                 </p>
               </div>
               <a href="#" class="btn">音乐播客</a>
@@ -63,17 +82,27 @@
       <li v-for="(cat, index) in cats" :key="index">
         <Container :title="`${cat.name} · 电台`">
           <template #right>
-            <a href="#" class="more">更多 ></a>
+            <a
+              href="#"
+              class="more"
+              @click.prevent="goTo('discover/djradio/category', cat)"
+              >更多 ></a
+            >
           </template>
           <template #content>
             <ul class="list">
               <li v-for="radio in radios[index]" :key="radio.id">
-                <a href="#" class="mask">
+                <a href="#" class="mask" @click.prevent="goTo('radio', radio)">
                   <img :src="`${radio.picUrl}?param=200y200`" alt="" />
                 </a>
                 <div class="dec">
                   <h3>
-                    <a href="#" :title="radio.name">{{ radio.name }}</a>
+                    <a
+                      href="#"
+                      :title="radio.name"
+                      @click.prevent="goTo('radio', radio)"
+                      >{{ radio.name }}</a
+                    >
                   </h3>
                   <p class="detail">{{ radio.rcmdtext }}</p>
                 </div>
@@ -87,33 +116,19 @@
 </template>
 
 <script>
+import Nav from "../nav";
+import { randomNums } from "@/utils";
+
 export default {
+  components: {
+    Nav,
+  },
   data() {
     return {
       programs: [],
       programRank: [],
-      cats: [
-        {
-          name: "音乐博客",
-          value: 2,
-        },
-        {
-          name: "生活",
-          value: 6,
-        },
-        {
-          name: "情感",
-          value: 3,
-        },
-        {
-          name: "创作翻唱",
-          value: 2001,
-        },
-        {
-          name: "知识",
-          value: 11,
-        },
-      ],
+      cats: [],
+      staticCats: [],
       radios: [],
     };
   },
@@ -130,11 +145,6 @@ export default {
         this.programRank = res.toplist;
       }
     });
-    Promise.all(this.cats.map((cat) => this.getRadio(cat.value))).then(
-      (res) => {
-        this.radios = res.map((radio) => radio.slice(0, 4));
-      }
-    );
   },
   methods: {
     getRadio(type) {
@@ -147,6 +157,24 @@ export default {
             }
           })
           .catch(reject);
+      });
+    },
+    goTo(target, obj) {
+      if (target === "radio") {
+        this.$router.push(`/${target}?id=${obj.id}`);
+      } else if (target === "discover/djradio/category") {
+        this.$router.push(`/${target}?id=${obj.id}`);
+      } else if (target === "program") {
+        this.$router.push(`/${target}?id=${obj.id}`);
+      }
+    },
+  },
+  watch: {
+    staticCats(newVal) {
+      let nums = randomNums(newVal.length - 1, 5);
+      this.cats = nums.map((num) => newVal[num]);
+      Promise.all(this.cats.map((cat) => this.getRadio(cat.id))).then((res) => {
+        this.radios = res.map((radio) => radio.slice(0, 4));
       });
     },
   },

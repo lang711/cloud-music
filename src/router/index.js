@@ -8,6 +8,14 @@ const routes = [
     component: () => import("views/playlist"),
   },
   {
+    path: "/program",
+    component: () => import("views/program"),
+  },
+  {
+    path: "/radio",
+    component: () => import("views/radio"),
+  },
+  {
     path: "/user",
     component: () => import("views/user"),
   },
